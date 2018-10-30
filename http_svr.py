@@ -15,16 +15,30 @@ import sys
 
 
 
-# Reverse a String 
+# Reverse a String
 def reverse(string):
     string = string[::-1]
     return string
+
+# Function to display hostname and
+# IP address
+def get_Host_name_IP():
+    try:
+        host_name = socket.gethostname()
+        host_ip = socket.gethostbyname(host_name)
+        print("Hostname :  ",host_name)
+        print("IP : ",host_ip)
+    except:
+        print("Unable to get Hostname and IP")
+
+
 
 
 
 
 HOST = '127.0.0.1'          # Default localhost
 PORT = 10100                # Default Port - Assigned Range is 10100 - 10109
+get_Host_name_IP()          # Identify Domain and IP on current machine 
 user_input = sys.argv[1]    # User Defined Port Number
 
 
