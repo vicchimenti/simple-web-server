@@ -15,7 +15,7 @@ import sys
 
 
 
-# Function to reverse a string
+# Reverse a String 
 def reverse(string):
     string = string[::-1]
     return string
