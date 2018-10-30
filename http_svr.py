@@ -6,10 +6,18 @@
 # Last Modified     10/30/2018
 # /usr/bin/python3
 
-import socket
 
-HOST = '127.0.0.1'  # Default localhost
-PORT = 10100        # Default Port - Assigned Range is 10100 - 10109
+
+
+import socket
+import sys
+
+
+
+
+HOST = '127.0.0.1'          # Default localhost
+PORT = 10100                # Default Port - Assigned Range is 10100 - 10109
+user_input = sys.argv[1]    # User Defined Port Number
 
 
 # open socket connection for TCP stream and listen
