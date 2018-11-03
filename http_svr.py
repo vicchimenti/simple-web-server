@@ -20,8 +20,7 @@ def reverse(string):
     string = string[::-1]
     return string
 
-# Function to display hostname and
-# IP address
+# Function to acquire and display hostname / IP address
 def get_host_name_IP():
     try:
         host = socket.gethostname()
@@ -37,7 +36,7 @@ def get_host_name_IP():
 
 # set defaults
 host_ip = '127.0.0.1'           # Default localhost IP address
-port = 10100                    # Default Port - Assigned Range is 10100 - 10109
+port = 10109                    # Default Port - Assigned Range is 10100 - 10109
 maximum_queue = 1               # Serve Only One Client at a Time
 get_host_name_IP()              # Identify Domain and IP on current machine
 
@@ -67,30 +66,31 @@ except sys.ValueError as e :
 
 # open socket connection for TCP stream and listen
 try :
-    with socket.socket (socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.bind ((host_ip, port))
-        sock.listen (maximum_queue)
-        print ("Listening for Client...")
+    sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
 except sys.OSError as e :
-    print ("ERROR Binding Socket to Listen : " + e)
+    print ("ERROR Creating Server Socket : " + e)
+
+sock.bind ((host_ip, port))
+sock.listen (maximum_queue)
+print ("Listening for Client...")
+
+
+(client, address) = sock.accept()
+print('Connection Established With: ', address)
+
+
+# receive request
+while True:
+    message = clientSock.recv(65536)
+    if not message:
+        break
+
+
+response = (reverse(message))
+clientSock.sendall(response)
 
 
 
 
-    client, address = sock.accept()
-
-    # reverse response
-    with client:
-        print('Connection Established With: ', address)
-        while True:
-            message = client.recv(65536)
-            if not message:
-                break
-        response = (reverse(message))
-        client.sendall(response)
-
-
-
-
-client.close()              # Close the Client Socket
-sys.exit()                  # Exit the Program
+clientSock.close()              # Close the Client Socket
+sys.exit()                      # Exit the Program
