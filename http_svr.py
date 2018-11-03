@@ -38,6 +38,7 @@ def get_host_name_IP():
 
 host_ip = '127.0.0.1'       # Default localhost IP address
 port = 10100                # Default Port - Assigned Range is 10100 - 10109
+maximum_queue = 1           # Serve Only One Client at a Time
 get_host_name_IP()          # Identify Domain and IP on current machine
 user_input = sys.argv[1]    # User Defined Port Number
 
@@ -47,7 +48,7 @@ user_input = sys.argv[1]    # User Defined Port Number
 # open socket connection for TCP stream and listen
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
     sock.bind((host_ip, port))
-    sock.listen()
+    sock.listen(maximum_queue)
     client, address = sock.accept()
 
     # reverse response
