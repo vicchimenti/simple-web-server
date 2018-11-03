@@ -35,20 +35,48 @@ def get_host_name_IP():
 
 
 
+# set defaults
+host_ip = '127.0.0.1'           # Default localhost IP address
+port = 10100                    # Default Port - Assigned Range is 10100 - 10109
+maximum_queue = 1               # Serve Only One Client at a Time
+get_host_name_IP()              # Identify Domain and IP on current machine
 
-host_ip = '127.0.0.1'       # Default localhost IP address
-port = 10100                # Default Port - Assigned Range is 10100 - 10109
-maximum_queue = 1           # Serve Only One Client at a Time
-get_host_name_IP()          # Identify Domain and IP on current machine
-user_input = sys.argv[1]    # User Defined Port Number
+
+
+# get user defined port number from the command line
+try :
+    user_input = sys.argv[1]
+except sys.IndexError as e :
+    print ("ERROR No Valid Command Line Input : " + e)
+    sys.exit ("Exiting Program")
+except sys.KeyError as e :
+    print ("ERROR Invalid Command Line Entry : " + e)
+    sys.exit ("Exiting Program")
+
+
+
+# convert input to port number
+try :
+    port = int (user_input)
+except : sys.ValueError as e :
+    print ("ERROR Not an Integer : " + e)
+    sys.exit ("Exiting Program")
 
 
 
 
 # open socket connection for TCP stream and listen
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-    sock.bind((host_ip, port))
-    sock.listen(maximum_queue)
+try :
+    with socket.socket (socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind ((host_ip, port))
+        sock.listen (maximum_queue)
+        print ("Listening for Client...")
+except sys.OSError as e :
+    print ("ERROR Binding Socket to Listen : " + e)
+
+
+
+
     client, address = sock.accept()
 
     # reverse response
