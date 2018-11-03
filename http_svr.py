@@ -58,7 +58,7 @@ except sys.KeyError as e :
 # convert input to port number
 try :
     port = int (user_input)
-except : sys.ValueError as e :
+except sys.ValueError as e :
     print ("ERROR Not an Integer : " + e)
     sys.exit ("Exiting Program")
 
