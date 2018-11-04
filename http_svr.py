@@ -65,29 +65,20 @@ except sys.ValueError as e :
 
 
 # open socket connection for TCP stream and listen
-try :
-    sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
-except sys.OSError as e :
-    print ("ERROR Creating Server Socket : " + e)
-
-sock.bind ((host_ip, port))
-sock.listen (maximum_queue)
-print ("Listening for Client on Port Number : " + user_input)
-
-
-(client, address) = sock.accept()
-print('Connection Established With: ' + address)
+with sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM) as sock :
+    sock.bind ((host_ip, port))
+    sock.listen (maximum_queue)
+    print ("Listening for Client on Port Number : " + user_input)
+    (client, address) = sock.accept()
+    print('Connection Established With: ' + address)
 
 
 # receive request
 while True:
     message = clientSock.recv(65536)
-    if not message:
-        break
-
-
-response = (reverse(message))
-clientSock.sendall(response)
+    if not message : break
+    response = (reverse(message))
+    clientSock.sendall(response)
 
 
 
