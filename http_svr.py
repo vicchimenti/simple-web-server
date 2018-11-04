@@ -69,6 +69,7 @@ with socket.socket (socket.AF_INET, socket.SOCK_STREAM) as sock :
     sock.bind ((host_ip, port))
     sock.listen (maximum_queue)
     print ("Listening for Client on Port Number : " + user_input)
+    sock.setblocking(False)
     (client, address) = sock.accept()
     print('Connection Established With: ' + address)
 #TODO we listen but don't accept
