@@ -38,6 +38,7 @@ def get_host_name_IP():
 host_ip = '127.0.0.1'           # Default localhost IP address
 port = 10109                    # Default Port - Assigned Range is 10100 - 10109
 maximum_queue = 1               # Serve Only One Client at a Time
+host = socket.gethostname()   #shouldn't need this, it's in the next function call
 get_host_name_IP()              # Identify Domain and IP on current machine
 
 
@@ -66,12 +67,13 @@ except sys.ValueError as e :
 
 # open socket connection for TCP stream and listen
 with socket.socket (socket.AF_INET, socket.SOCK_STREAM) as sock :
-    sock.bind ((host_ip, port))
-    sock.listen (maximum_queue)
+    sock.bind ((host, port))
+    sock.listen (10)
     print ("Listening for Client on Port Number : " + user_input)
-    sock.setblocking(False)
-    (client, address) = sock.accept()
-    print('Connection Established With: ' + address)
+    #sock.settimeout(0)
+    (clientSock, address) = sock.accept()
+    addr_str = str (address)
+    print('Connection Established With: ' + addr_str)
 #TODO we listen but don't accept
 
 # receive request
