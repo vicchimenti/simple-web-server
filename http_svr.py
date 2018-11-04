@@ -24,8 +24,8 @@ def reverse(string):
 
 
 # set defaults
-port = 10109                            # Default Port - Assigned Range is 10100 - 10109
-maximum_queue = 1                       # Serve Only One Client at a Time
+port = 10109            # Default Port - Assigned Range is 10100 - 10109
+maximum_queue = 1       # Serve Only One Client at a Time
 
 
 
@@ -45,7 +45,7 @@ except OSError as e :
     sys.exit("Exiting Program")
 
 # *************TS OUTPUT *****************
-print ("Hostname :  ", host)
+print ("Hostname :  " + host)
 print ("IP : ", host_ip)
 
 
@@ -74,30 +74,35 @@ except sys.ValueError as e :
 
 
 # open socket connection for TCP stream and listen
-with socket.socket (socket.AF_INET, socket.SOCK_STREAM) as sock :
-    sock.bind ((host, port))
-    sock.listen (10)
-    print ("Listening for Client on Port Number : " + user_input)
-    #sock.settimeout(0)
+sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
+sock.bind ((host, port))
+sock.listen (maximum_queue)
+print ("Listening for Client on Port Number : " + user_input)
+
+
+
+while True :
     (clientSock, address) = sock.accept()
     addr_str = str (address)
     print('Connection Established With: ' + addr_str)
-#TODO we listen and accept but don't communicate
 
 
 
 
-# receive request
-while True:
-    message = clientSock.recv(65536)
-    if not message : break
+    # receive request
+    while True :
+        message = clientSock.recv (65536)
+        if not message : break
 
 
 
-# respond to request
-response = (reverse(message))
-clientSock.sendall(response)
+    # respond to request
+    response = (reverse(message))
+    clientSock.sendall(response)
 
+# *** TS *** stall program end
+admin_response = input ("Would you like to accept another client? : y/n: ")
+print (admin_response)
 
 
 
