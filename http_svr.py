@@ -72,11 +72,11 @@ except sys.OSError as e :
 
 sock.bind ((host_ip, port))
 sock.listen (maximum_queue)
-print ("Listening for Client...")
+print ("Listening for Client on Port Number : " + user_input)
 
 
 (client, address) = sock.accept()
-print('Connection Established With: ', address)
+print('Connection Established With: ' + address)
 
 
 # receive request
