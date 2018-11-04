@@ -24,11 +24,11 @@ def reverse(string):
 def get_host_name_IP():
     try:
         host = socket.gethostname()
-        host_ip = socket.gethostbyname(host)
-        print("Hostname :  ",host)
-        print("IP : ",host_ip)
+        host_ip = socket.gethostbyname (host)
+        print ("Hostname :  ", host)
+        print ("IP : ", host_ip)
     except:
-        print("Unable to get Hostname and IP")
+        print ("Unable to get Hostname and IP")
 
 
 
