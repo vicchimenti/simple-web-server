@@ -65,7 +65,7 @@ except sys.ValueError as e :
 
 
 # open socket connection for TCP stream and listen
-with sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM) as sock :
+with socket.socket (socket.AF_INET, socket.SOCK_STREAM) as sock :
     sock.bind ((host_ip, port))
     sock.listen (maximum_queue)
     print ("Listening for Client on Port Number : " + user_input)
