@@ -71,7 +71,7 @@ with socket.socket (socket.AF_INET, socket.SOCK_STREAM) as sock :
     print ("Listening for Client on Port Number : " + user_input)
     (client, address) = sock.accept()
     print('Connection Established With: ' + address)
-
+#TODO we listen but don't accept
 
 # receive request
 while True:
