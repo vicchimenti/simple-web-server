@@ -3,8 +3,8 @@
 # http_svr.py
 # A Simple Web Server in Python3
 # Created           10/30/2018
-# Last Modified     11/3/2018
-# /usr/bin/python3
+# Last Modified     11/4/2018
+# /usr/local/python3/bin/python3
 
 
 
@@ -38,7 +38,7 @@ def get_host_name_IP():
 host_ip = '127.0.0.1'           # Default localhost IP address
 port = 10109                    # Default Port - Assigned Range is 10100 - 10109
 maximum_queue = 1               # Serve Only One Client at a Time
-host = socket.gethostname()   #shouldn't need this, it's in the next function call
+#host = socket.gethostname()   #shouldn't need this, it's in the next function call
 get_host_name_IP()              # Identify Domain and IP on current machine
 
 
@@ -74,14 +74,21 @@ with socket.socket (socket.AF_INET, socket.SOCK_STREAM) as sock :
     (clientSock, address) = sock.accept()
     addr_str = str (address)
     print('Connection Established With: ' + addr_str)
-#TODO we listen but don't accept
+#TODO we listen and accept but don't communicate
+
+
+
 
 # receive request
 while True:
     message = clientSock.recv(65536)
     if not message : break
-    response = (reverse(message))
-    clientSock.sendall(response)
+
+
+
+# respond to request    
+response = (reverse(message))
+clientSock.sendall(response)
 
 
 
