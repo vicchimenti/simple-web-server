@@ -20,26 +20,34 @@ def reverse(string):
     string = string[::-1]
     return string
 
-# Function to acquire and display hostname / IP address
-def get_host_name_IP():
-    try:
-        host = socket.gethostname()
-        host_ip = socket.gethostbyname (host)
-        print ("Hostname :  ", host)
-        print ("IP : ", host_ip)
-    except:
-        print ("Unable to get Hostname and IP")
-
-
 
 
 
 # set defaults
-host_ip = '127.0.0.1'           # Default localhost IP address
-port = 10109                    # Default Port - Assigned Range is 10100 - 10109
-maximum_queue = 1               # Serve Only One Client at a Time
-#host = socket.gethostname()   #shouldn't need this, it's in the next function call
-get_host_name_IP()              # Identify Domain and IP on current machine
+port = 10109                            # Default Port - Assigned Range is 10100 - 10109
+maximum_queue = 1                       # Serve Only One Client at a Time
+
+
+
+
+# get the hostname
+try :
+    host = socket.gethostname()
+except OSError as e :
+    print ("ERROR Failed to Get Hostname : " + e)
+    sys.exit("Exiting Program")
+
+# get the host IP number
+try :
+    host_ip = socket.gethostbyname(host)
+except OSError as e :
+    print ("ERROR Failed to Get Host IP Number : " + e)
+    sys.exit("Exiting Program")
+
+# *************TS OUTPUT *****************
+print ("Hostname :  ", host)
+print ("IP : ", host_ip)
+
 
 
 
@@ -86,7 +94,7 @@ while True:
 
 
 
-# respond to request    
+# respond to request
 response = (reverse(message))
 clientSock.sendall(response)
 
