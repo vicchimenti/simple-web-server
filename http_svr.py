@@ -96,14 +96,14 @@ while True :
 
 
     # parse message for path
-    message = message.decode('utf-8')
-    print ("Message : " + message)
+    msg = message.decode('utf-8')
+    print ("Message : " + msg)
 
 
     # TS ****
-    reverse(message)
+    reverse(msg)
     clientSock.sendall(message.encode('utf-8'))
-    
+
     # respond to request
     # client.sendfile()
     # Close the Client Socket
