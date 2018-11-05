@@ -3,7 +3,7 @@
 # http_svr.py
 # A Simple Web Server in Python3
 # Created           10/30/2018
-# Last Modified     11/4/2018
+# Last Modified     11/5/2018
 # /usr/local/python3/bin/python3
 
 
@@ -101,7 +101,7 @@ while True :
     clientSock.sendall(response)
 
 
-    
+
 
 # *** TS *** stall program end
 admin_response = input ("Would you like to accept another client? : y/n: ")
