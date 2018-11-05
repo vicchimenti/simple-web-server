@@ -96,7 +96,7 @@ while True :
 
 
     # parse message for path
-    message = message.decode(utf-8)
+    message = message.decode('utf-8')
     print ("Message : " + message)
 
 
