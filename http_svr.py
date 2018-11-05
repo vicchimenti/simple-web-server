@@ -23,8 +23,12 @@ def reverse(string):
 
 
 # set defaults
-port = 10109            # Default Port - Assigned Range is 10100 - 10109
-maximum_queue = 1       # Serve Only One Client at a Time
+port = 10109                # Default Port - Assigned Range is 10100 - 10109
+maximum_queue = 1           # Serve Only One Client at a Time
+full_message = ""           # string to collect decoded client message
+client_method = "GET"       # acceptable client method
+client_protocol = "HTTP"    # accepotable client protocol
+
 
 
 
@@ -98,8 +102,8 @@ while True :
 
 
     # TS ****
-    reverse(full_message)
-    clientSock.sendall(full_message.encode('utf-8'))
+    reverse_message = reverse(full_message)
+    clientSock.sendall(reverse_message.encode('utf-8'))
 
 
     # respond to request
