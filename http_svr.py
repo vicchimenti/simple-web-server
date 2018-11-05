@@ -91,7 +91,7 @@ while True :
 
     # receive request
     while True :
-        message = clientSock.recv (65536)
+        message = clientSock.recv (4096)
         if not message : break
 
 
