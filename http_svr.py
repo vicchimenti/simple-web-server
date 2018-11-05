@@ -100,6 +100,9 @@ while True :
     response = (reverse(message))
     clientSock.sendall(response)
 
+
+    
+
 # *** TS *** stall program end
 admin_response = input ("Would you like to accept another client? : y/n: ")
 print (admin_response)
