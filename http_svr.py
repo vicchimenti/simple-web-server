@@ -83,7 +83,7 @@ print ("Listening for Client on Port Number : " + user_input)
 while True :
     (clientSock, address) = sock.accept()
     addr_str = str (address)
-    print("Connection Established With: "" + addr_str)
+    print("Connection Established With: " + addr_str)
 
 
     # receive request
