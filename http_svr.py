@@ -100,7 +100,7 @@ while True :
 
 
     # respond to request
-    os.sendfile(index.html)
+    clientSock.sendfile("web_root/index.html")
 
 
     # Close the Client Socket
@@ -117,3 +117,17 @@ print (admin_response)
 
 
 sys.exit()                      # Exit the Program
+
+
+
+
+#def send_file(path, sock):
+#    with open(path, "rb") as file:
+        # First read file into memory
+#        content = file.read()
+        # Now calculate size and convert it into 8-byte long bytes sequence
+#        size = struct.pack("<Q", len(content))
+        # Send the file size
+#        sock.send(size)
+        # Send the file
+#        sock.send(content)
