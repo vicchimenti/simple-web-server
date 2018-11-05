@@ -16,11 +16,11 @@ import sys
 
 
 # set defaults
-port = 10109                # Default Port - Assigned Range is 10100 - 10109
-maximum_queue = 1           # Serve Only One Client at a Time
-full_message = ""           # string to collect decoded client message
-client_method = "GET"       # acceptable client method
-client_protocol = "HTTP"    # accepotable client protocol
+port = 10109                    # Default Port - Assigned Range is 10100 - 10109
+maximum_queue = 1               # Serve Only One Client at a Time
+full_message = ""               # string to collect decoded client message
+client_method = "GET"           # acceptable client method
+client_protocol = "HTTP/1.1"    # acceptable client protocol
 
 
 
@@ -31,14 +31,14 @@ try :
     host = socket.gethostname()
 except OSError as e :
     print ("ERROR Failed to Get Hostname : " + e)
-    sys.exit("Exiting Program")
+    sys.exit ("Exiting Program")
 
 # get the host IP number
 try :
     host_ip = socket.gethostbyname(host)
 except OSError as e :
     print ("ERROR Failed to Get Host IP Number : " + e)
-    sys.exit("Exiting Program")
+    sys.exit ("Exiting Program")
 
 # *************TS OUTPUT *****************
 print ("Hostname :  " + host)
@@ -80,7 +80,7 @@ print ("Listening for Client on Port Number : " + user_input)
 while True :
     (clientSock, address) = sock.accept()
     addr_str = str (address)
-    print("Connection Established With: " + addr_str)
+    print ("Connection Established With: " + addr_str)
 
 
     # receive request
@@ -95,12 +95,12 @@ while True :
 
 
     # **** TS Echo ****
-    clientSock.sendall(full_message.encode('utf-8'))
+    clientSock.sendall(full_message.encode ('utf-8'))
     print ("Message Sent : " + full_message)
 
 
     # respond to request
-    clientSock.sendfile("web_root/index.html")
+    # clientSock.sendfile("/web_root/index.html")
 
 
     # Close the Client Socket
@@ -117,6 +117,14 @@ print (admin_response)
 
 
 sys.exit()                      # Exit the Program
+
+
+
+
+
+
+
+
 
 
 
