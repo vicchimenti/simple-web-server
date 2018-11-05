@@ -83,29 +83,29 @@ print ("Listening for Client on Port Number : " + user_input)
 while True :
     (clientSock, address) = sock.accept()
     addr_str = str (address)
-    print('Connection Established With: ' + addr_str)
-
-
+    print("Connection Established With: "" + addr_str)
 
 
     # receive request
     while True :
         message = clientSock.recv (4096)
+        full_message += message.decode ('utf-8')
         if not message : break
 
 
-
     # parse message for path
-    msg = message.decode('utf-8')
-    print ("Message : " + msg)
+    print ("Message : " + full_message)
 
 
     # TS ****
-    reverse(msg)
-    clientSock.sendall(msg.encode('utf-8'))
+    reverse(full_message)
+    clientSock.sendall(full_message.encode('utf-8'))
+
 
     # respond to request
     # client.sendfile()
+
+
     # Close the Client Socket
     clientSock.close()
 
