@@ -14,13 +14,6 @@ import sys
 
 
 
-# Reverse a String
-def reverse(string):
-    string = string[::-1]
-    return string
-
-
-
 
 # set defaults
 port = 10109                # Default Port - Assigned Range is 10100 - 10109
@@ -101,9 +94,8 @@ while True :
     print ("Message : " + full_message)
 
 
-    # TS ****
-    reverse_message = reverse(full_message)
-    clientSock.sendall(reverse_message.encode('utf-8'))
+    # **** TS Echo ****
+    clientSock.sendall(full_message.encode('utf-8'))
 
 
     # respond to request
