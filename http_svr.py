@@ -100,7 +100,7 @@ while True :
 
 
     # respond to request
-    clientSock.sendfile(index.html)
+    os.sendfile(index.html)
 
 
     # Close the Client Socket
