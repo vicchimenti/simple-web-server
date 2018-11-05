@@ -102,7 +102,7 @@ while True :
 
     # TS ****
     reverse(msg)
-    clientSock.sendall(message.encode('utf-8'))
+    clientSock.sendall(msg.encode('utf-8'))
 
     # respond to request
     # client.sendfile()
