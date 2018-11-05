@@ -14,7 +14,6 @@ import sys
 
 
 
-
 # Reverse a String
 def reverse(string):
     string = string[::-1]
@@ -96,9 +95,18 @@ while True :
 
 
 
+    # parse message for path
+    message = message.decode(utf-8)
+    print ("Message : " + message)
+
+
+    # TS ****
+    reverse(message)
+    clientSock.sendall(message)
     # respond to request
-    response = (reverse(message))
-    clientSock.sendall(response)
+    #client.sendfile()
+    # Close the Client Socket
+    clientSock.close()
 
 
 
@@ -109,5 +117,5 @@ print (admin_response)
 
 
 
-clientSock.close()              # Close the Client Socket
+
 sys.exit()                      # Exit the Program
