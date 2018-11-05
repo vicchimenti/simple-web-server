@@ -91,15 +91,16 @@ while True :
 
 
     # parse message for path
-    print ("Message : " + full_message)
+    print ("Message Received : " + full_message)
 
 
     # **** TS Echo ****
     clientSock.sendall(full_message.encode('utf-8'))
+    print ("Message Sent : " + full_message)
 
 
     # respond to request
-    # client.sendfile()
+    clientSock.sendfile(index.html)
 
 
     # Close the Client Socket
