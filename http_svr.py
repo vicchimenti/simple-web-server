@@ -20,6 +20,7 @@ port = 10109                    # Default Port - Assigned Range is 10100 - 10109
 maximum_queue = 1               # Serve Only One Client at a Time
 client_method = "GET"           # acceptable client method
 client_protocol = "HTTP/1.1"    # acceptable client protocol
+endOf_header = "\r\n\r\n"       # header - body delimiter
 
 
 
@@ -82,25 +83,51 @@ while True :
     print ("Connection Established With: " + addr_str)
 
     # string to collect decoded client message
-    full_message = ""
+    client_message = ""
+    status = ""
 
     # receive request
     while True :
         message = clientSock.recv (4096)
-        full_message += message.decode ('utf-8')
+        client_message += message.decode ('utf-8')
         if not message : break
 
 
     # *** TS Print Message
     print ("Message Received : " + full_message)
 
+    # parse request for GET
+    x = client_message.find (client_method)
 
-    # **** TS Echo ****
-    clientSock.sendall(full_message.encode ('utf-8'))
-    print ("Message Sent : " + full_message)
+    # if request is GET then truncate message
+    if x != -1 :
+        #path_protocol = full_message[x+1:]
+        client_message.replace (client_method, "")
+    else :
+        status = "501 Not Implemented – the request method was not GET"
+        clientSock.sendall (status.encode ('utf-8'))
+        clientSock.close()
+        break
 
+    #if protocol is HTTP parse path from message
+    x = client_message.find (client_protocol)
+
+    # if request is in HTTP format
+    if x != -1 :
+        path = client_message[:x]
+    else :
+        status = "400 Bad Request – the request is not a properly formed HTTP request"
+        clientSock.sendall (status.encode ('utf-8'))
+        clientSock.close()
+        break
+
+
+    # **** TS Echo Path ****
+    clientSock.sendall(path.encode ('utf-8'))
+    print ("Message Sent : " + path)
 
     # respond to request
+    # feed file contents into a string before sending body
     # clientSock.sendfile("/web_root/index.html")
 
 
