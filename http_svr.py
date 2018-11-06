@@ -90,7 +90,7 @@ while True :
         if not message : break
 
 
-    # parse message for path
+    # *** TS Print Message
     print ("Message Received : " + full_message)
 
 
