@@ -11,6 +11,7 @@
 
 import socket
 import sys
+import os                       # file and directory information
 
 
 
@@ -21,6 +22,7 @@ maximum_queue = 1               # Serve Only One Client at a Time
 client_method = "GET"           # acceptable client method
 client_protocol = "HTTP/1.1"    # acceptable client protocol
 endOf_header = "\r\n\r\n"       # header - body delimiter
+new_line = "\r\n"               # newline delimiter
 
 
 
@@ -94,7 +96,7 @@ while True :
 
 
     # *** TS Print Message
-    print ("Message Received : " + full_message)
+    print ("Message Received : " + client_message)
 
     # parse request for GET
     x = client_message.find (client_method)
@@ -102,7 +104,8 @@ while True :
     # if request is GET then truncate message
     if x != -1 :
         #path_protocol = full_message[x+1:]
-        client_message.replace (client_method, "")
+        #client_message.replace (client_method, "")
+        get_request, path_protocol = client_message.split(client_method, 2)
     else :
         status = "501 Not Implemented – the request method was not GET"
         clientSock.sendall (status.encode ('utf-8'))
@@ -110,20 +113,32 @@ while True :
         break
 
     #if protocol is HTTP parse path from message
-    x = client_message.find (client_protocol)
+    x = path_protocol.find (client_protocol)
 
     # if request is in HTTP format
     if x != -1 :
-        path = client_message[:x]
+        path = path_protocol[:x]
     else :
         status = "400 Bad Request – the request is not a properly formed HTTP request"
         clientSock.sendall (status.encode ('utf-8'))
         clientSock.close()
         break
 
+    # validate requested path
+    cwd = os.getcwd()
+    x = path.find(cwd)
+
+    # if the working directory is in the requested path
+    if x != -1 :
+        directory, requested_file, conn_request = path.split(cwd, new_line, 3)
+    else :
+        status = "404 Not Found – the file indicated by the path does not exist"
+        clientSock.sendall (status.encode ('utf-8'))
+        clientSock.close()
+        break
 
     # **** TS Echo Path ****
-    clientSock.sendall(path.encode ('utf-8'))
+    clientSock.sendall(requested_file.encode ('utf-8'))
     print ("Message Sent : " + path)
 
     # respond to request
