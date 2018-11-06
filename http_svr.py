@@ -18,7 +18,6 @@ import sys
 # set defaults
 port = 10109                    # Default Port - Assigned Range is 10100 - 10109
 maximum_queue = 1               # Serve Only One Client at a Time
-full_message = ""               # string to collect decoded client message
 client_method = "GET"           # acceptable client method
 client_protocol = "HTTP/1.1"    # acceptable client protocol
 
@@ -82,6 +81,8 @@ while True :
     addr_str = str (address)
     print ("Connection Established With: " + addr_str)
 
+    # string to collect decoded client message
+    full_message = ""
 
     # receive request
     while True :
