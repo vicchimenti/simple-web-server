@@ -24,6 +24,10 @@ client_protocol = "HTTP/1.1"    # acceptable client protocol
 endOf_header = "\r\n\r\n"       # header - body delimiter
 END_RESPONSE = "\r\n\t\r\n\t"
 new_line = "\r\n"               # newline delimiter
+SINGLE_SLASH = "/"
+DEFAULT_PATH = "web_root/index.html"
+requested_file = ""#bytearray()
+
 
 
 
@@ -124,22 +128,51 @@ while True :
 
     # validate requested path
     cwd = os.getcwd()
-    x = path.find(cwd)
-
-    # if the working directory is in the requested path
-    if x != -1 :
-        directory, requested_file, conn_request = path.partition(cwd)
+    if path != SINGLE_SLASH :
+        x = path.find(cwd)
+        # if the working directory is in the requested path
+        if x != -1 :
+            try :
+                with open(path, "rb") as file:
+                    requested_file = file.read()
+            except OSError :
+                print ("ERROR Accessing Path Provided")
+                status = "404 Not Found – the file indicated by the path does not exist"
+                status += END_RESPONSE
+                clientSock.sendall (status.encode ('utf-8'))
+                clientSock.close()
+                sys.exit ("Exiting Program")
+        else :
+            status = "404 Not Found – the file indicated by the path does not exist"
+            status += END_RESPONSE
+            clientSock.sendall (status.encode ('utf-8'))
+            clientSock.close()
     else :
-        status = "404 Not Found – the file indicated by the path does not exist"
-        status += END_RESPONSE
-        clientSock.sendall (status.encode ('utf-8'))
-        clientSock.close()
+        path += DEFAULT_PATH
+        try :
+            with open(path, "r") as file:
+                requested_file = file.read()
+        except OSError :
+            print ("ERROR Accessing Default Path")
+            status = "404 Not Found – the file indicated by the path does not exist"
+            status += END_RESPONSE
+            clientSock.sendall (status.encode ('utf-8'))
+            clientSock.close()
+            sys.exit ("Exiting Program")
+
+
 
 
     # **** TS Echo Path ****
+    print ("requested_file : " + requested_file)
+    #delim_in_bytes = END_RESPONSE.encode('utf-8')
     requested_file += END_RESPONSE
-    clientSock.sendall(requested_file.encode ('utf-8'))
-    print ("Message Sent : " + path)
+    try :
+        clientSock.sendall(requested_file.encode('utf-8'))
+        print ("Message Sent : " + path)
+    except OSError :
+        print ("ERROR Sending Requested File")
+        sys.exit ("Exiting Program")
 
     # respond to request
     # feed file contents into a string before sending body
