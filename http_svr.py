@@ -24,9 +24,10 @@ client_protocol = "HTTP/1.1"    # acceptable client protocol
 endOf_header = "\r\n\r\n"       # header - body delimiter
 END_RESPONSE = "\r\n\t\r\n\t"
 new_line = "\r\n"               # newline delimiter
-SINGLE_SLASH = " / "
+SINGLE_SLASH = "/"
 DEFAULT_PATH = "web_root/index.html"
 requested_file = ""#bytearray()
+WEB_ROOT = "web_root"
 
 
 
@@ -102,60 +103,64 @@ while True :
     # *** TS Print Message
     print ("Message Received : " + client_message)
 
-    # parse request for GET
+
+
+
+    # parse and process client request
     x = client_message.find (client_method)
     # if request is GET then truncate message
     if x != -1 :
         get_request, path_protocol = client_message.split(client_method, 2)
     else :
-        status = "501 Not Implemented – the request method was not GET"
+        status = "501 Not Implemented"
+        status += endOf_header
         status += END_RESPONSE
         clientSock.sendall (status.encode ('utf-8'))
         clientSock.close()
-
+        sys.exit ("Exiting Program")
 
     #if protocol is HTTP parse path from message
     x = path_protocol.find (client_protocol)
     # if request is in HTTP format
     if x != -1 :
         path = path_protocol[:x]
+        path = path.lstrip()
+        print ("path_holder :" + path)
     else :
-        status = "400 Bad Request – the request is not a properly formed HTTP request"
+        status = "400 Bad Request"
+        status += endOf_header
         status += END_RESPONSE
         clientSock.sendall (status.encode ('utf-8'))
         clientSock.close()
-
+        sys.exit ("Exiting Program")
 
     # validate requested path
-    cwd = os.getcwd()
-    if path != SINGLE_SLASH :
-        x = path.find(cwd)
-        # if the working directory is in the requested path
-        if x != -1 :
-            try :
-                with open(path, "rb") as file:
-                    requested_file = file.read()
-            except OSError :
-                print ("ERROR Accessing Path Provided")
-                status = "404 Not Found – the file indicated by the path does not exist"
-                status += END_RESPONSE
-                clientSock.sendall (status.encode ('utf-8'))
-                clientSock.close()
-                sys.exit ("Exiting Program")
-        else :
-            status = "404 Not Found – the file indicated by the path does not exist"
-            status += END_RESPONSE
-            clientSock.sendall (status.encode ('utf-8'))
-            clientSock.close()
-    else :
+    if path == '/' :
         path = DEFAULT_PATH
         try :
             with open(path, "r") as file:
                 requested_file = file.read()
         except OSError :
             print ("ERROR Accessing Default Path")
-            status = "404 Not Found – the file indicated by the path does not exist"
+            status = "404 Not Found"
+            status += endOf_header
             status += END_RESPONSE
+            clientSock.sendall (status.encode ('utf-8'))
+            clientSock.close()
+            sys.exit ("Exiting Program")
+    else :
+        print ("path :" + path)
+        path = WEB_ROOT + path
+        print ("web_root + path :" + path)
+        try :
+            with open(path, "r") as file:
+                requested_file = file.read()
+        except OSError :
+            print ("ERROR Accessing Path Provided")
+            status = "404 Not Found"
+            status += endOf_header
+            status += END_RESPONSE
+            print ("status : " + status)
             clientSock.sendall (status.encode ('utf-8'))
             clientSock.close()
             sys.exit ("Exiting Program")
@@ -163,21 +168,19 @@ while True :
 
 
 
-    # **** TS Echo Path ****
+    # send file to client
     print ("path : " + path)
     print ("requested_file : " + requested_file)
     #delim_in_bytes = END_RESPONSE.encode('utf-8')
+    requested_file += endOf_header
     requested_file += END_RESPONSE
     try :
         clientSock.sendall(requested_file.encode('utf-8'))
-        print ("Message Sent : " + path)
     except OSError :
         print ("ERROR Sending Requested File")
         sys.exit ("Exiting Program")
 
-    # respond to request
-    # feed file contents into a string before sending body
-    # clientSock.sendfile("/web_root/index.html")
+
 
 
     # Close the Client Socket
@@ -186,33 +189,4 @@ while True :
 
 
 
-# *** TS *** stall program end
-admin_response = input ("Would you like to accept another client? : y/n: ")
-print (admin_response)
-
-
-
-
 sys.exit()                      # Exit the Program
-
-
-
-
-
-
-
-
-
-
-
-
-#def send_file(path, sock):
-#    with open(path, "rb") as file:
-        # First read file into memory
-#        content = file.read()
-        # Now calculate size and convert it into 8-byte long bytes sequence
-#        size = struct.pack("<Q", len(content))
-        # Send the file size
-#        sock.send(size)
-        # Send the file
-#        sock.send(content)
