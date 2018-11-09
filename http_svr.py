@@ -3,7 +3,7 @@
 # http_svr.py
 # A Simple Web Server in Python3
 # Created           10/30/2018
-# Last Modified     11/6/2018
+# Last Modified     11/8/2018
 # /usr/local/python3/bin/python3
 
 
@@ -24,7 +24,7 @@ client_protocol = "HTTP/1.1"    # acceptable client protocol
 endOf_header = "\r\n\r\n"       # header - body delimiter
 END_RESPONSE = "\r\n\t\r\n\t"
 new_line = "\r\n"               # newline delimiter
-SINGLE_SLASH = "/"
+SINGLE_SLASH = " / "
 DEFAULT_PATH = "web_root/index.html"
 requested_file = ""#bytearray()
 
@@ -148,7 +148,7 @@ while True :
             clientSock.sendall (status.encode ('utf-8'))
             clientSock.close()
     else :
-        path += DEFAULT_PATH
+        path = DEFAULT_PATH
         try :
             with open(path, "r") as file:
                 requested_file = file.read()
@@ -164,6 +164,7 @@ while True :
 
 
     # **** TS Echo Path ****
+    print ("path : " + path)
     print ("requested_file : " + requested_file)
     #delim_in_bytes = END_RESPONSE.encode('utf-8')
     requested_file += END_RESPONSE
