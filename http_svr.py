@@ -108,7 +108,7 @@ while True :
         status += END_RESPONSE
         clientSock.sendall (status.encode ('utf-8'))
         clientSock.close()
-        break
+
 
     #if protocol is HTTP parse path from message
     x = path_protocol.find (client_protocol)
@@ -120,7 +120,7 @@ while True :
         status += END_RESPONSE
         clientSock.sendall (status.encode ('utf-8'))
         clientSock.close()
-        break
+
 
     # validate requested path
     cwd = os.getcwd()
@@ -128,13 +128,13 @@ while True :
 
     # if the working directory is in the requested path
     if x != -1 :
-        directory, requested_file, conn_request = path.split(cwd, new_line, 3)
+        directory, requested_file, conn_request = path.partition(cwd)
     else :
         status = "404 Not Found – the file indicated by the path does not exist"
         status += END_RESPONSE
         clientSock.sendall (status.encode ('utf-8'))
         clientSock.close()
-        break
+
 
     # **** TS Echo Path ****
     requested_file += END_RESPONSE
