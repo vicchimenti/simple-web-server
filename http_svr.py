@@ -22,6 +22,7 @@ maximum_queue = 1               # Serve Only One Client at a Time
 client_method = "GET"           # acceptable client method
 client_protocol = "HTTP/1.1"    # acceptable client protocol
 endOf_header = "\r\n\r\n"       # header - body delimiter
+END_RESPONSE = "\r\n\t\r\n\t"
 new_line = "\r\n"               # newline delimiter
 
 
@@ -94,32 +95,29 @@ while True :
         client_message += message.decode ('utf-8')
         if not message : break
 
-
     # *** TS Print Message
     print ("Message Received : " + client_message)
 
     # parse request for GET
     x = client_message.find (client_method)
-
     # if request is GET then truncate message
     if x != -1 :
-        #path_protocol = full_message[x+1:]
-        #client_message.replace (client_method, "")
         get_request, path_protocol = client_message.split(client_method, 2)
     else :
         status = "501 Not Implemented – the request method was not GET"
+        status += END_RESPONSE
         clientSock.sendall (status.encode ('utf-8'))
         clientSock.close()
         break
 
     #if protocol is HTTP parse path from message
     x = path_protocol.find (client_protocol)
-
     # if request is in HTTP format
     if x != -1 :
         path = path_protocol[:x]
     else :
         status = "400 Bad Request – the request is not a properly formed HTTP request"
+        status += END_RESPONSE
         clientSock.sendall (status.encode ('utf-8'))
         clientSock.close()
         break
@@ -133,11 +131,13 @@ while True :
         directory, requested_file, conn_request = path.split(cwd, new_line, 3)
     else :
         status = "404 Not Found – the file indicated by the path does not exist"
+        status += END_RESPONSE
         clientSock.sendall (status.encode ('utf-8'))
         clientSock.close()
         break
 
     # **** TS Echo Path ****
+    requested_file += END_RESPONSE
     clientSock.sendall(requested_file.encode ('utf-8'))
     print ("Message Sent : " + path)
 
