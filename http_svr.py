@@ -95,10 +95,16 @@ while True :
     status = ""
 
     # receive request
-    while True :
-        message = clientSock.recv (4096)
-        client_message += message.decode ('utf-8')
-        if not message : break
+    try :
+        while True :
+            message = clientSock.recv (4096)
+            client_message += message.decode ('utf-8')
+            x = client_message.find(endOf_header)
+            if x != -1 : break
+            if not message : break
+    except OSError :
+        print ("ERROR Receiving Request: ")
+        sys.exit ("Exiting Program")
 
     # *** TS Print Message
     print ("Message Received : " + client_message)
@@ -149,7 +155,7 @@ while True :
             clientSock.close()
             sys.exit ("Exiting Program")
     else :
-        print ("path :" + path)
+        print ("path else:" + path)
         path = WEB_ROOT + path
         print ("web_root + path :" + path)
         try :
