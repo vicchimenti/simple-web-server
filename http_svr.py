@@ -118,7 +118,7 @@ while True :
         try :
             get_request, path_protocol = client_message.split(client_method, 2)
         except OSError :
-            sys.stderr.write("ERROR Unable to Strip Request Type")
+            sys.stderr.write("ERROR Unable to Strip Request Type : ")
             sys.exit("Exiting Program")
     else :
         status = "501 Not Implemented"
@@ -135,7 +135,7 @@ while True :
             path = path.lstrip()
             print ("path_holder :" + path)
         except OSError :
-            sys.stderr.write("ERROR Unable to Strip Protocol")
+            sys.stderr.write("ERROR Unable to Strip Protocol : ")
             sys.exit("Exiting Program")
     else :
         status = "400 Bad Request"
@@ -144,7 +144,7 @@ while True :
             clientSock.sendall (status.encode ('utf-8'))
             clientSock.close()
         except OSError :
-            sys.stderr.write("ERROR Sending Status Code 400")
+            sys.stderr.write("ERROR Sending Status Code 400 : ")
             sys.exit("Exiting Program")
 
     # validate requested path
@@ -155,7 +155,7 @@ while True :
             with open(path, "r") as file:
                 requested_file = file.read()
         except OSError :
-            sys.stderr.write("ERROR Reading File")
+            sys.stderr.write("ERROR Reading File : ")
             sys.exit("Exiting Program")
 
     else :
@@ -167,7 +167,7 @@ while True :
             with open(path, "r") as file:
                 requested_file = file.read()
         except OSError :
-            sys.stderr.write("ERROR Reading Requested File")
+            sys.stderr.write("ERROR Reading Requested File : ")
             status = "404 Not Found"
             status += endOf_header
             print ("status : " + status)
