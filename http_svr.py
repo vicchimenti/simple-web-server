@@ -26,7 +26,6 @@ END_RESPONSE = "\r\n\t\r\n\t"
 new_line = "\r\n"               # newline delimiter
 SINGLE_SLASH = "/"
 DEFAULT_PATH = "web_root/index.html"
-requested_file = ""#bytearray()
 WEB_ROOT = "web_root"
 
 
@@ -91,6 +90,7 @@ while True :
     print ("Connection Established With: " + addr_str)
 
     # string to collect decoded client message
+    requested_file = ""
     client_message = ""
     status = ""
 
@@ -115,7 +115,11 @@ while True :
     x = client_message.find (client_method)
     # if request is GET then truncate message
     if x != -1 :
-        get_request, path_protocol = client_message.split(client_method, 2)
+        try :
+            get_request, path_protocol = client_message.split(client_method, 2)
+        except OSError :
+            sys.stderr.write("ERROR Unable to Strip Request Type")
+            sys.exit("Exiting Program")
     else :
         status = "501 Not Implemented"
         status += endOf_header
@@ -131,7 +135,7 @@ while True :
             path = path.lstrip()
             print ("path_holder :" + path)
         except OSError :
-            sys.stderr.write("ERROR Unable to Strip Path")
+            sys.stderr.write("ERROR Unable to Strip Protocol")
             sys.exit("Exiting Program")
     else :
         status = "400 Bad Request"
@@ -145,6 +149,7 @@ while True :
 
     # validate requested path
     if path == '/' :
+        # empty path provided
         path = DEFAULT_PATH
         try :
             with open(path, "r") as file:
@@ -152,13 +157,9 @@ while True :
         except OSError :
             sys.stderr.write("ERROR Reading File")
             sys.exit("Exiting Program")
-        print ("ERROR Accessing Default Path")
-        status = "404 Not Found"
-        status += endOf_header
-        clientSock.sendall (status.encode ('utf-8'))
-        clientSock.close()
 
     else :
+        # client provided path
         print ("path else:" + path)
         path = WEB_ROOT + path
         print ("web_root + path :" + path)
@@ -166,14 +167,13 @@ while True :
             with open(path, "r") as file:
                 requested_file = file.read()
         except OSError :
-            print ("ERROR Accessing Path Provided")
+            sys.stderr.write("ERROR Reading Requested File")
             status = "404 Not Found"
             status += endOf_header
-
             print ("status : " + status)
             clientSock.sendall (status.encode ('utf-8'))
             clientSock.close()
-            sys.exit ("Exiting Program")
+
 
 
 
