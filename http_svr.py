@@ -156,7 +156,7 @@ while True :
             with open(path, "r") as file:
                 requested_file = file.read()
         except OSError :
-            sys.stderr.write("ERROR Reading Default File : ")
+            print("ERROR Reading Default File : ")
             status = "404 Not Found"
             status += endOf_header
 
@@ -169,7 +169,7 @@ while True :
             with open(path, "r") as file:
                 requested_file = file.read()
         except OSError :
-            sys.stderr.write("ERROR Reading Requested File : ")
+            print("ERROR Reading Requested File : ")
             status = "404 Not Found"
             status += endOf_header
 
@@ -182,10 +182,9 @@ while True :
     # send file to client
     print ("status : " + status)
     print ("path : " + path)
-    print ("requested_file : " + requested_file)
-    #delim_in_bytes = END_RESPONSE.encode('utf-8')
     requested_file += endOf_header
     requested_file = status + requested_file
+    print ("requested_file : " + requested_file)
 
     try :
         clientSock.sendall(requested_file.encode('utf-8'))
@@ -198,6 +197,7 @@ while True :
 
     # Close the Client Socket
     clientSock.close()
+    print ("Listening for Next Client on Port Number : " + user_input)
 
 
 
