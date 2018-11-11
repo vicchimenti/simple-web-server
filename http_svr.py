@@ -19,15 +19,17 @@ import os                       # file and directory information
 # set defaults
 port = 10109                    # Default Port - Assigned Range is 10100 - 10109
 maximum_queue = 1               # Serve Only One Client at a Time
+charset = "UTF-8"               # default encoding protocol
 client_method = "GET"           # acceptable client method
 client_protocol = "HTTP/1.1"    # acceptable client protocol
-endOf_header = "\r\n\r\n"       # header - body delimiter
+END_HEADER = "\r\n\r\n"         # header - body delimiter
 new_line = "\r\n"               # newline delimiter
 SINGLE_SLASH = "/"              # single slash delimiter
 DEFAULT_PATH = "/web_root/"
 WEB_ROOT = "/web_root"
 DEFAULT_FILE = "index.html"
 EXIT_SOCKET = 0
+
 
 
 
@@ -94,36 +96,37 @@ print ("Listening for Client on Port Number : " + user_input)
 
 # open client sockets and exchange messages
 while True :
+
+    # initialize header status field
+    status = ""
+
     try :
         (clientSock, address) = sock.accept()
         addr_str = str (address)
         print ("Connection Established With: " + addr_str)
     except ConnectionError :
         print ("ERROR Unable to Connect with Client")
+        status = "500 Internal Server Error"
         EXIT_SOCKET = 1
-
-
-
 
     # proceed when exit socket is not active
     if EXIT_SOCKET == 0 :
 
-        # initialize strings to collect decoded client message
+        # initialize header status field
         requested_file = ""
         client_message = ""
-        status = ""
 
         # receive request
         try :
             while True :
-                message = clientSock.recv (4096)
-                client_message += message.decode ('utf-8')
-                x = client_message.find(endOf_header)
+                message = clientSock.recv (65536)
+                client_message += message.decode (charset)
+                x = client_message.find(END_HEADER)
                 if x != -1 : break
         except OSError :
-                sys.stderr.write("ERROR Receiving Client Message : ")
+                print ("ERROR Receiving Client Message : ")
                 status = "500 Internal Error"
-                status += endOf_header
+                status += END_HEADER
 
         # *** TS Print Message
         print ("Message Received : " + client_message)
@@ -140,10 +143,10 @@ while True :
             except OSError :
                 sys.stderr.write("ERROR Unable to Strip Request Type : ")
                 status = "501 Not Implemented"
-                status += endOf_header
+                status += END_HEADER
         else :
             status = "501 Not Implemented"
-            status += endOf_header
+            status += END_HEADER
 
 
 
@@ -159,10 +162,10 @@ while True :
             except OSError :
                 sys.stderr.write("ERROR Unable to Strip Protocol : ")
                 status = "400 Bad Request"
-                status += endOf_header
+                status += END_HEADER
         else :
             status = "400 Bad Request"
-            status += endOf_header
+            status += END_HEADER
 
 
         # get the current working directory
@@ -180,7 +183,7 @@ while True :
             except OSError :
                 sys.stderr.write("ERROR Reading Default File : ")
                 status = "404 Not Found"
-                status += endOf_header
+                status += END_HEADER
 
         else :
             # client provided path
@@ -199,35 +202,31 @@ while True :
             except FileNotFoundError :
                 print ("ERROR Path Not Found")
                 status = "404 Not Found"
-                status += endOf_header
+                status += END_HEADER
             try :
                 with open(file_name, 'rb') as file:
                     requested_file = file.read()
                 status = "200 OK"
-                status += endOf_header
+                status += END_HEADER
             except OSError :
                 print ("ERROR Reading Requested File")
                 status = "500 Internal Server Error"
-                status += endOf_header
+                status += END_HEADER
 
 
 
+    # send file to client
+    print ("status : " + status)
+    print ("path : " + path)
+    requested_file += new_line
+    requested_file = status + requested_file
+    print ("requested_file : " + requested_file)
 
-
-
-
-        # send file to client
-        print ("status : " + status)
-        print ("path : " + path)
-        requested_file += new_line
-        requested_file = status + requested_file
-        print ("requested_file : " + requested_file)
-
-        try :
-            clientSock.sendall(requested_file.encode('utf-8'))
-        except OSError :
-            print ("ERROR Sending Requested File")
-            sys.exit ("Exiting Program")
+    try :
+        clientSock.sendall(requested_file.encode(charset))
+    except OSError :
+        print ("ERROR Sending Requested File")
+        sys.exit ("Exiting Program")
 
 
 
@@ -235,10 +234,8 @@ while True :
         # Close the Client Socket
         clientSock.close()
         print ("Listening for Next Client on Port Number : " + user_input)
-    else :
-        # Close the Client Socket
-        clientSock.close()
-        print ("Listening for Next Client on Port Number : " + user_input)
+
+
 
 
 
