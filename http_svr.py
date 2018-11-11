@@ -384,7 +384,7 @@ while True :
                             + CHARSET_FIELD \
                             + charset)
         print (DATE_FIELD + ": " + date_value)
-        print (LAST_MODIFIED_FIELD + " : " + modified_date)
+        print (LAST_MODIFIED_FIELD + ": " + modified_date)
         print (LENGTH_FIELD + ": " + length_str)
         print (CONNECTION_FIELD + ": " + connection_value)
 
