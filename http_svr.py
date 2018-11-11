@@ -170,10 +170,17 @@ while True :
         print ("web_root + path :" + path)
         #path = cwd + path
         path, file_name = path.rsplit(SINGLE_SLASH, 1)
+        print ("relative path :" + path)
         path = cwd + path
-        print ("pure path :" + path)
+        print ("absolute path :" + path)
         print ("file_name :" + file_name)
-        os.chdir(path)
+        try :
+            os.chdir(path)
+            print(os.getcwd())
+        except FileNotFoundError :
+            print ("ERROR Path Not Found")
+            status = "404 Not Found"
+            status += endOf_header
         try :
             file = open(file_name, 'r')
             requested_file = file.read()
@@ -182,8 +189,8 @@ while True :
             status = "200 OK"
             status += endOf_header
         except OSError :
-            sys.stderr.write("ERROR Reading Requested File : ")
-            status = "404 Not Found"
+            print ("ERROR Reading Requested File")
+            status = "500 Internal Server Error"
             status += endOf_header
 
 
