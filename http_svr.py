@@ -297,6 +297,9 @@ while True :
 
 
 
+    # *************** Everything works fine ****************
+    # *******Now Build my header with all client expected attributes ******
+
     # prep results for delivery
     print ("error message : " + error_message)
     print ("status : " + status)
