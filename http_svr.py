@@ -20,7 +20,6 @@ import os                       # file and directory information
 END_HEADER = "\r\n\r\n"         # header - body delimiter
 NEW_LINE = "\r\n"               # newline delimiter
 SINGLE_SLASH = "/"              # single slash delimiter
-DEFAULT_PATH = "/web_root/"
 WEB_ROOT = "/web_root"
 DEFAULT_FILE = "index.html"
 EXIT_SOCKET = 0
@@ -199,55 +198,58 @@ while True :
 
 
 
+                # proceed when exit socket is not active
                 if EXIT_SOCKET == 0 :
 
+                    # get the current working directory
+                    cwd = os.getcwd()
+                    # initialize the file string
+                    requested_file = ""
 
-                # get the current working directory
-                cwd = os.getcwd()
-                # initialize the file string
-                requested_file = ""
-                # validate requested path
-                if path == SINGLE_SLASH :
-                    # empty path provided
-                    path = DEFAULT_PATH
-                    path = cwd + path
-                    # update the working directory
-                    os.chdir(path)
-                    try :
-                        with open(DEFAULT_FILE, 'rb') as file:
-                            requested_file = file.read()
-                    except OSError :
-                        sys.stderr.write("ERROR Reading Default File : ")
-                        status = "404 Not Found"
-                        status += END_HEADER
-
-                else :
-                    # client provided path
-                    print ("path else:" + path)
-                    path = WEB_ROOT + path
-                    print ("web_root + path :" + path)
-                    path = cwd + path
-                    print ("relative path :" + path)
-                    path, file_name = path.rsplit(SINGLE_SLASH, 1)
-                    print ("absolute path :" + path)
-                    file_name = file_name.rstrip()
-                    print ("file_name :" + file_name)
-                    try :
+                    # requested path is empty
+                    if path == SINGLE_SLASH :
+                        # empty path provided
+                        path = cwd + WEB_ROOT
+                        print ("absolute path if :" + path)
+                        # update the working directory
                         os.chdir(path)
                         print(os.getcwd())
-                    except FileNotFoundError :
-                        print ("ERROR Path Not Found")
-                        status = "404 Not Found"
-                        status += END_HEADER
-                    try :
-                        with open(file_name, 'rb') as file:
-                            requested_file = file.read()
-                        status = "200 OK"
-                        status += END_HEADER
-                    except OSError :
-                        print ("ERROR Reading Requested File")
-                        status = "500 Internal Server Error"
-                        status += END_HEADER
+                        try :
+                            with open(DEFAULT_FILE, 'rb') as file:
+                                requested_file = file.read()
+                            status = "200 OK"
+                        except OSError :
+                            error_message = "ERROR Reading Default File"
+                            status = "404 Not Found"
+                            print (status + " : " + error_message)
+
+                    # requested path contains a directory
+                    else :
+                        # client provided path
+                        print ("path else:" + path)
+                        path = WEB_ROOT + path
+                        print ("web_root + path :" + path)
+                        path = cwd + path
+                        print ("relative path :" + path)
+                        path, file_name = path.rsplit(SINGLE_SLASH, 1)
+                        print ("absolute path else :" + path)
+                        file_name = file_name.rstrip()
+                        print ("file_name :" + file_name)
+                        try :
+                            os.chdir(path)
+                            print(os.getcwd())
+                        except FileNotFoundError :
+                            print ("ERROR Path Not Found")
+                            status = "404 Not Found"
+                            status += END_HEADER
+                        try :
+                            with open(file_name, 'rb') as file:
+                                requested_file = file.read()
+                            status = "200 OK"
+                        except OSError :
+                            print ("ERROR Reading Requested File")
+                            status = "500 Internal Server Error"
+                            status += END_HEADER
 
 
 
