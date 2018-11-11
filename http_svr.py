@@ -231,7 +231,7 @@ while True :
 
                         # open the file and assign to a string
                         try :
-                            with open(DEFAULT_FILE, 'rb') as file:
+                            with open(DEFAULT_FILE, 'r') as file:
                                 requested_file = file.read()
                             status = "200 OK"
                         except filename :
@@ -278,7 +278,7 @@ while True :
 
                         # open the file and assign to a string
                         try :
-                            with open(file_name, 'rb') as file:
+                            with open(file_name, 'r') as file:
                                 requested_file = file.read()
                             status = "200 OK"
                         except filename :
