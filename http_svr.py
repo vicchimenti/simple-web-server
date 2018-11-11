@@ -23,7 +23,7 @@ charset = "UTF-8"               # default encoding protocol
 client_method = "GET"           # acceptable client method
 client_protocol = "HTTP/1.1"    # acceptable client protocol
 END_HEADER = "\r\n\r\n"         # header - body delimiter
-new_line = "\r\n"               # newline delimiter
+NEW_LINE = "\r\n"               # newline delimiter
 SINGLE_SLASH = "/"              # single slash delimiter
 DEFAULT_PATH = "/web_root/"
 WEB_ROOT = "/web_root"
@@ -218,7 +218,7 @@ while True :
     # send file to client
     print ("status : " + status)
     print ("path : " + path)
-    requested_file += new_line
+    requested_file += NEW_LINE
     requested_file = status + requested_file
     print ("requested_file : " + requested_file)
 
