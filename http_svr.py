@@ -434,7 +434,7 @@ while True :
             requested_file = status + error_message
         # return results to client
         try :
-            clientSock.sendall(requested_file.encode(charset))
+            clientSock.sendall(requested_file)
         except OSError :
             print ("ERROR Sending Requested File")
             sys.exit ("Exiting Program")
