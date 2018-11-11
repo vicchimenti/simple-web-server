@@ -125,8 +125,8 @@ while True :
         print ("Connection Established With: " + addr_str)
     except ConnectionError :
         error_message = "ERROR Unable to Connect with Client"
-        print (error_message)
         status = "500 Internal Server Error"
+        print (status + " : " + error_message)
         EXIT_SOCKET = 1
 
     # proceed when exit socket is not active
@@ -143,100 +143,104 @@ while True :
                 x = client_message.find(END_HEADER)
                 if x != -1 : break
         except OSError :
-                print ("ERROR Receiving Client Message")
+                error_message = "ERROR Receiving Client Message"
                 status = "500 Internal Error"
-                status += END_HEADER
+                print (status + " : " + error_message)
                 EXIT_SOCKET = 2
 
 
 
         # proceed when exit socket is not active
-        if EXIT_SOCKET == 0
+        if EXIT_SOCKET == 0 :
 
-            # *** TS Print Message
-            print ("Message Received : " + client_message)
+            # Display the Client Request
+            print ("Client Request :\n" + client_message)
 
             # parse and process client request
             x = client_message.find (client_method)
-            # if request is GET then truncate message
+            # if request is approved request method then begin processing
             if x != -1 :
                 try :
                     get_request, path_protocol = \
                         client_message.split(client_method, 2)
                 except OSError :
-                    print ("ERROR Unable to Strip Request Type")
+                    error_message = "ERROR Unable to Strip Request Type"
                     status = "501 Not Implemented"
-                    status += END_HEADER
+                    print (status + " : " + error_message)
+                    EXIT_SOCKET = 3
             else :
+                error_message = "ERROR Invalid Request Type"
                 status = "501 Not Implemented"
-                status += END_HEADER
+                print (status + " : " + error_message)
+                EXIT_SOCKET = 3
 
 
+            # proceed when exit socket is not active
+            if EXIT_SOCKET == 0 :
 
-
-            #if protocol is HTTP parse path from message
-            x = path_protocol.find (client_protocol)
-            # if request is in HTTP format
-            if x != -1 :
-                try :
-                    path = path_protocol[:x]
-                    path = path.strip()
-                    print ("path_holder :" + path)
-                except OSError :
-                    sys.stderr.write("ERROR Unable to Strip Protocol : ")
+                #if protocol is HTTP parse path from message
+                x = path_protocol.find (client_protocol)
+                # if request is in HTTP format
+                if x != -1 :
+                    try :
+                        path = path_protocol[:x]
+                        path = path.strip()
+                        print ("path_holder :" + path)
+                    except OSError :
+                        sys.stderr.write("ERROR Unable to Strip Protocol : ")
+                        status = "400 Bad Request"
+                        status += END_HEADER
+                else :
                     status = "400 Bad Request"
                     status += END_HEADER
-            else :
-                status = "400 Bad Request"
-                status += END_HEADER
 
 
-            # get the current working directory
-            cwd = os.getcwd()
-            # initialize the file string
-            requested_file = ""
-            # validate requested path
-            if path == SINGLE_SLASH :
-                # empty path provided
-                path = DEFAULT_PATH
-                path = cwd + path
-                # update the working directory
-                os.chdir(path)
-                try :
-                    with open(DEFAULT_FILE, 'rb') as file:
-                        requested_file = file.read()
-                except OSError :
-                    sys.stderr.write("ERROR Reading Default File : ")
-                    status = "404 Not Found"
-                    status += END_HEADER
-
-            else :
-                # client provided path
-                print ("path else:" + path)
-                path = WEB_ROOT + path
-                print ("web_root + path :" + path)
-                path = cwd + path
-                print ("relative path :" + path)
-                path, file_name = path.rsplit(SINGLE_SLASH, 1)
-                print ("absolute path :" + path)
-                file_name = file_name.rstrip()
-                print ("file_name :" + file_name)
-                try :
+                # get the current working directory
+                cwd = os.getcwd()
+                # initialize the file string
+                requested_file = ""
+                # validate requested path
+                if path == SINGLE_SLASH :
+                    # empty path provided
+                    path = DEFAULT_PATH
+                    path = cwd + path
+                    # update the working directory
                     os.chdir(path)
-                    print(os.getcwd())
-                except FileNotFoundError :
-                    print ("ERROR Path Not Found")
-                    status = "404 Not Found"
-                    status += END_HEADER
-                try :
-                    with open(file_name, 'rb') as file:
-                        requested_file = file.read()
-                    status = "200 OK"
-                    status += END_HEADER
-                except OSError :
-                    print ("ERROR Reading Requested File")
-                    status = "500 Internal Server Error"
-                    status += END_HEADER
+                    try :
+                        with open(DEFAULT_FILE, 'rb') as file:
+                            requested_file = file.read()
+                    except OSError :
+                        sys.stderr.write("ERROR Reading Default File : ")
+                        status = "404 Not Found"
+                        status += END_HEADER
+
+                else :
+                    # client provided path
+                    print ("path else:" + path)
+                    path = WEB_ROOT + path
+                    print ("web_root + path :" + path)
+                    path = cwd + path
+                    print ("relative path :" + path)
+                    path, file_name = path.rsplit(SINGLE_SLASH, 1)
+                    print ("absolute path :" + path)
+                    file_name = file_name.rstrip()
+                    print ("file_name :" + file_name)
+                    try :
+                        os.chdir(path)
+                        print(os.getcwd())
+                    except FileNotFoundError :
+                        print ("ERROR Path Not Found")
+                        status = "404 Not Found"
+                        status += END_HEADER
+                    try :
+                        with open(file_name, 'rb') as file:
+                            requested_file = file.read()
+                        status = "200 OK"
+                        status += END_HEADER
+                    except OSError :
+                        print ("ERROR Reading Requested File")
+                        status = "500 Internal Server Error"
+                        status += END_HEADER
 
 
 
