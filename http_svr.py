@@ -319,7 +319,7 @@ while True :
 
                         # get time last modified
                         try :
-                            modified_date = os.path.getmtime()
+                            modified_date = os.path.getmtime(file_name)
                         except OSError :
                             error_message = "ERROR Obtaining Modified Time"
                             status = "500 Internal Server Error"
