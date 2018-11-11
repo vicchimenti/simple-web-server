@@ -221,8 +221,6 @@ while True :
                         protocol = CLIENT_PROTOCOL
                         path = path.strip()
                         protocol = protocol.strip()
-                        print ("path_holder :" + path)
-                        print ("protocol :" + protocol)
                     except IndexError :
                         error_message = "ERROR Unable to Strip Protocol"
                         status = "400 Bad Request"
@@ -246,7 +244,6 @@ while True :
                     if path == SINGLE_SLASH :
                         # empty path provided
                         path = cwd + WEB_ROOT
-                        print ("absolute path if :" + path)
 
                         # update the working directory
                         try :
@@ -292,16 +289,12 @@ while True :
                     # requested path contains a directory
                     else :
                         # client provided path
-                        print ("path else:" + path)
                         path = WEB_ROOT + path
-                        print ("web_root + path :" + path)
                         path = cwd + path
-                        print ("relative path :" + path)
 
                         # split the path from the requested file
                         try :
                             path, file_name = path.rsplit(SINGLE_SLASH, 1)
-                            print ("absolute path else :" + path)
                         except IndexError :
                             error_message = "ERROR Spliting Filename from Path"
                             status = "400 Bad Request"
@@ -310,7 +303,6 @@ while True :
                         # strip the file name of any trailing whitespace
                         try:
                             file_name = file_name.rstrip()
-                            print ("file_name :" + file_name)
                         except IndexError :
                             error_message = \
                                 "ERROR Striping Whitespace from Filename"
@@ -320,7 +312,6 @@ while True :
                         # change to requested directory
                         try :
                             os.chdir(path)
-                            print(os.getcwd())
                         except FileNotFoundError :
                             error_message = "ERROR Path Not Found"
                             status = "404 Not Found"
@@ -389,23 +380,6 @@ while True :
 
     # if no errors
     if error_message == NEW_LINE :
-        # *************** Everything works fine ****************
-        # *******Now Build my header with all client expected attributes ******
-        print ("error message : " + error_message)
-        print ("status : " + status)
-        print ("path : " + path)
-        print ("protocol : " + protocol)
-        print (protocol + WHITE_SPACE + status + NEW_LINE)
-        print (CONTENT_TYPE + ": " \
-                            + mime_type \
-                            + SEMI_COLON \
-                            + WHITE_SPACE \
-                            + CHARSET_FIELD \
-                            + charset)
-        print (DATE_FIELD + ": " + date_value)
-        print (LAST_MODIFIED_FIELD + ": " + modified_date)
-        print (LENGTH_FIELD + ": " + length_str)
-        print (CONNECTION_FIELD + ": " + connection_value)
 
         # prep results for delivery
         try :
@@ -445,6 +419,7 @@ while True :
             status = "500 Internal Server Error\r\n"
             requested_file = status + error_message
             print (status + " : " + error_message)
+
 
 
 
