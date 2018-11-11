@@ -78,13 +78,26 @@ except sys.ValueError as e :
 
 
 # open socket connection for TCP stream and listen
-sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
-sock.bind ((host, port))
-sock.listen (maximum_queue)
+try :
+    sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
+except OSError :
+    print ("ERROR Establishing a Socket")
+    sys.exit ("Exiting Program")
+try :
+    sock.bind ((host, port))
+except OSError :
+    print ("ERROR Binding the Host and Port")
+    sys.exit ("Exiting Program")
+try :
+    sock.listen (maximum_queue)
+except OSError :
+    print ("ERROR Opening a Listening Socket")
+    sys.exit ("Exiting Program")
+
+
+
+# 
 print ("Listening for Client on Port Number : " + user_input)
-
-
-
 while True :
     (clientSock, address) = sock.accept()
     addr_str = str (address)
