@@ -239,6 +239,7 @@ while True :
                     if path == SINGLE_SLASH :
                         # empty path provided
                         path = cwd + WEB_ROOT
+                        file_name = DEFAULT_FILE
                         print ("absolute path if :" + path)
 
                         # update the working directory
@@ -277,7 +278,7 @@ while True :
 
                         # open the file and assign to a string
                         try :
-                            with open(DEFAULT_FILE, 'rb') as file:
+                            with open(file_name, 'rb') as file:
                                 requested_file = file.read()
                             status = "200 OK"
                         except FileNotFoundError :
