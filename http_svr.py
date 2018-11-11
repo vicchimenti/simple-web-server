@@ -168,11 +168,11 @@ while True :
         print ("path else:" + path)
         path = WEB_ROOT + path
         print ("web_root + path :" + path)
-        #path = cwd + path
-        path, file_name = path.rsplit(SINGLE_SLASH, 1)
-        print ("relative path :" + path)
         path = cwd + path
+        print ("relative path :" + path)
+        path, file_name = path.rsplit(SINGLE_SLASH, 1)
         print ("absolute path :" + path)
+        file_name = file_name.rstrip()
         print ("file_name :" + file_name)
         try :
             os.chdir(path)
@@ -182,10 +182,8 @@ while True :
             status = "404 Not Found"
             status += endOf_header
         try :
-            file = open(file_name, 'r')
-            requested_file = file.read()
-            #with open(file_name, 'r') as file:
-            #    requested_file = file.read()
+            with open(file_name, 'r') as file:
+                requested_file = file.read()
             status = "200 OK"
             status += endOf_header
         except OSError :
