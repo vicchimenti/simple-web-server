@@ -39,6 +39,13 @@ error_message = NEW_LINE        # default error message for response header
 
 
 
+# establish working directory
+try :
+    server_home = getcwd()
+except AttributeError :
+    error_message = "ERROR Failed to Get Current Working Directory"
+    print (error_message)
+    sys.exit ("Exiting Program")
 
 # get the hostname
 try :
@@ -115,6 +122,9 @@ print ("Listening for Client on Port Number : " + user_input)
 # open client sockets and exchange messages
 while True :
 
+    # reset working directory each iteration
+    cwd = server_home
+
     # initialize header status field
     status = ""
 
@@ -157,7 +167,7 @@ while True :
 
             # parse and process client request
             x = client_message.find (client_method)
-            # if request is approved request method then begin processing
+            # if request is approved method then begin processing
             if x != -1 :
                 try :
                     get_request, path_protocol = \
@@ -201,8 +211,6 @@ while True :
                 # proceed when exit socket is not active
                 if EXIT_SOCKET == 0 :
 
-                    # get the current working directory
-                    cwd = os.getcwd()
                     # initialize the file string
                     requested_file = ""
 
@@ -228,7 +236,7 @@ while True :
                             status = "200 OK"
                         except filename :
                             error_message = "ERROR Reading Default File"
-                            status = "404 Not Found"
+                            status = "500 Internal Server Error"
                             print (status + " : " + error_message)
 
                     # requested path contains a directory
@@ -239,35 +247,58 @@ while True :
                         print ("web_root + path :" + path)
                         path = cwd + path
                         print ("relative path :" + path)
-                        path, file_name = path.rsplit(SINGLE_SLASH, 1)
-                        print ("absolute path else :" + path)
-                        file_name = file_name.rstrip()
-                        print ("file_name :" + file_name)
+
+                        # split the path from the requested file
+                        try :
+                            path, file_name = path.rsplit(SINGLE_SLASH, 1)
+                            print ("absolute path else :" + path)
+                        except IndexError :
+                            error_message = "ERROR Spliting Filename from Path"
+                            status = "400 Bad Request"
+                            print (status + " : " + error_message)
+
+                        # strip the file name of any trailing whitespace
+                        try:
+                            file_name = file_name.rstrip()
+                            print ("file_name :" + file_name)
+                        except IndexError :
+                            error_message = \
+                                "ERROR Striping Whitespace from Filename"
+                            status = "400 Bad Request"
+                            print (status + " : " + error_message)
+
+                        # change to requested directory
                         try :
                             os.chdir(path)
                             print(os.getcwd())
                         except FileNotFoundError :
-                            print ("ERROR Path Not Found")
+                            error_message = "ERROR Path Not Found"
                             status = "404 Not Found"
-                            status += END_HEADER
+                            print (status + " : " + error_message)
+
+                        # open the file and assign to a string
                         try :
                             with open(file_name, 'rb') as file:
                                 requested_file = file.read()
                             status = "200 OK"
                         except filename :
-                            print ("ERROR Reading Requested File")
+                            error_message = "ERROR Reading Requested File"
                             status = "500 Internal Server Error"
-                            status += END_HEADER
+                            print (status + " : " + error_message)
 
 
 
-    # send file to client
+
+    # prep results for delivery
+    print ("error message : " + error_message)
     print ("status : " + status)
     print ("path : " + path)
+    status += NEW_LINE
+    error_message += END_HEADER
     requested_file += NEW_LINE
-    requested_file = status + requested_file
+    requested_file = status + error_message + requested_file
     print ("requested_file : " + requested_file)
-
+    # return results to client
     try :
         clientSock.sendall(requested_file.encode(charset))
     except OSError :
