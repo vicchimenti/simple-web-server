@@ -43,7 +43,7 @@ error_message = NEW_LINE        # default error message for response header
 # get the hostname
 try :
     host = socket.gethostname()
-except OSError :
+except AttributeError :
     error_message = "ERROR Failed to Get Hostname"
     print (error_message)
     sys.exit ("Exiting Program")
@@ -51,7 +51,7 @@ except OSError :
 # get the host IP number
 try :
     host_ip = socket.gethostbyname(host)
-except OSError :
+except AttributeError :
     error_message = "ERROR Failed to Get Host IP Number"
     print (error_message)
     sys.exit ("Exiting Program")
@@ -85,7 +85,7 @@ except ValueError :
 # open socket connection for TCP stream
 try :
     sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
-except OSError :
+except ConnectionError :
     error_message = "ERROR Establishing a Socket"
     print (error_message)
     sys.exit ("Exiting Program")
@@ -93,7 +93,7 @@ except OSError :
 # bind the socket to the port
 try :
     sock.bind ((host, port))
-except OSError :
+except ConnectionError :
     error_message = "ERROR Binding the Host and Port"
     print (error_message)
     sys.exit ("Exiting Program")
@@ -101,7 +101,7 @@ except OSError :
 # set socket to listen
 try :
     sock.listen (maximum_queue)
-except OSError :
+except ConnectionError :
     error_message = "ERROR Opening a Listening Socket"
     print (error_message)
     sys.exit ("Exiting Program")
@@ -141,7 +141,7 @@ while True :
                 client_message += message.decode (charset)
                 x = client_message.find(END_HEADER)
                 if x != -1 : break
-        except OSError :
+        except ConnectionError :
                 error_message = "ERROR Receiving Client Message"
                 status = "500 Internal Error"
                 print (status + " : " + error_message)
@@ -162,7 +162,7 @@ while True :
                 try :
                     get_request, path_protocol = \
                         client_message.split(client_method, 2)
-                except OSError :
+                except IndexError :
                     error_message = "ERROR Unable to Strip Request Type"
                     status = "501 Not Implemented"
                     print (status + " : " + error_message)
@@ -185,7 +185,7 @@ while True :
                         path = path_protocol[:x]
                         path = path.strip()
                         print ("path_holder :" + path)
-                    except OSError :
+                    except IndexError :
                         error_message = "ERROR Unable to Strip Protocol"
                         status = "400 Bad Request"
                         print (status + " : " + error_message)
@@ -211,14 +211,22 @@ while True :
                         # empty path provided
                         path = cwd + WEB_ROOT
                         print ("absolute path if :" + path)
+
                         # update the working directory
-                        os.chdir(path)
-                        print(os.getcwd())
+                        try :
+                            os.chdir(path)
+                            print(os.getcwd())
+                        except FileNotFoundError :
+                            error_message = "ERROR Path Not Found"
+                            status = "404 Not Found"
+                            print (status + " : " + error_message)
+
+                        # open the file and assign to a string
                         try :
                             with open(DEFAULT_FILE, 'rb') as file:
                                 requested_file = file.read()
                             status = "200 OK"
-                        except OSError :
+                        except filename :
                             error_message = "ERROR Reading Default File"
                             status = "404 Not Found"
                             print (status + " : " + error_message)
@@ -246,7 +254,7 @@ while True :
                             with open(file_name, 'rb') as file:
                                 requested_file = file.read()
                             status = "200 OK"
-                        except OSError :
+                        except filename :
                             print ("ERROR Reading Requested File")
                             status = "500 Internal Server Error"
                             status += END_HEADER
