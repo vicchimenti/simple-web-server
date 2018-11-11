@@ -359,8 +359,13 @@ while True :
             modified_line = LAST_MODIFIED_FIELD + COLON \
                                                 + WHITE_SPACE \
                                                 + modified_date
-            length_line =   LENGTH_FIELD
-            error_message += END_HEADER
+            length_line =   LENGTH_FIELD        + COLON \
+                                                + WHITE_SPACE \
+                                                + length_str
+            connect_line =  CONNECTION_FIELD    + COLON \
+                                                + WHITE_SPACE \
+                                                + connection_value
+
 
         except TypeError :
             error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n"
@@ -374,6 +379,8 @@ while True :
         except OSError :
             print ("ERROR Sending Requested File")
             sys.exit ("Exiting Program")
+    else:
+        error_message += END_HEADER
 
 
 
