@@ -41,8 +41,8 @@ error_message = NEW_LINE        # default error message for response header
 
 # establish working directory
 try :
-    server_home = getcwd()
-except AttributeError :
+    server_home = os.getcwd()
+except NameError :
     error_message = "ERROR Failed to Get Current Working Directory"
     print (error_message)
     sys.exit ("Exiting Program")
