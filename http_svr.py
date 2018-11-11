@@ -27,7 +27,7 @@ CLIENT_PROTOCOL = "HTTP/1.1"    # acceptable client protocol
 CONNECTION_FIELD = "Connection"
 DATE_FIELD = "Date"
 LAST_MODIFIED_FIELD = "Last-Modified"
-CONTENT_LENGTH_FIELD = "Content-Length"
+LENGTH_FIELD = "Content-Length"
 CONTENT_TYPE = "Content-Type"
 CHARSET_FIELD = "charset="
 TEXT_TYPE = "text/html"
@@ -323,38 +323,57 @@ while True :
 
 
 
+    # if no errors
+    if error_message == NEW_LINE :
+        # *************** Everything works fine ****************
+        # *******Now Build my header with all client expected attributes ******
+        print ("error message : " + error_message)
+        print ("status : " + status)
+        print ("path : " + path)
+        print ("protocol : " + protocol)
+        print (protocol + WHITE_SPACE + status + NEW_LINE)
+        print (CONTENT_TYPE + ": " \
+                            + file_type \
+                            + SEMI_COLON \
+                            + WHITE_SPACE \
+                            + CHARSET_FIELD \
+                            + charset)
+        print (DATE_FIELD + ": " + date_value)
+        print (LAST_MODIFIED_FIELD + " : " + modified_date)
+        print (LENGTH_FIELD + ": " + length_str)
+        print (CONNECTION_FIELD + ": " + connection_value)
 
-    # *************** Everything works fine ****************
-    # *******Now Build my header with all client expected attributes ******
+        # prep results for delivery
+        try :
+            status_line =   protocol + WHITE_SPACE + status + NEW_LINE
+            content_line =  CONTENT_TYPE        + COLON \
+                                                + WHITE_SPACE \
+                                                + file_type \
+                                                + SEMI_COLON \
+                                                + WHITE_SPACE \
+                                                + CHARSET_FIELD \
+                                                + charset
+            date_line =     DATE_FIELD          + COLON \
+                                                + WHITE_SPACE \
+                                                + date_value
+            modified_line = LAST_MODIFIED_FIELD + COLON \
+                                                + WHITE_SPACE \
+                                                + modified_date
+            length_line =   LENGTH_FIELD
+            error_message += END_HEADER
 
-    # prep results for delivery
-    print ("error message : " + error_message)
-    print ("status : " + status)
-    print ("path : " + path)
-    print ("protocol : " + protocol)
-    print (CONTENT_TYPE + " : " + file_type)
-    print (CONTENT_LENGTH_FIELD + " : " + length_str)
-    print (LAST_MODIFIED_FIELD + " : " + modified_date)
-    print (CONNECTION_FIELD + " : " + connection_value)
-    print (DATE_FIELD + " : " + date_value)
-    print (DATE_FIELD + " : " + date_value)
-    try :
-        status = protocol + WHITE_SPACE + status + NEW_LINE
-        error_message += END_HEADER
-        requested_file += NEW_LINE
-        requested_file = status + error_message + requested_file
-    except TypeError :
-        error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n"
-        status = "500 Internal Server Error\r\n"
-        requested_file = status + error_message
-        print (status + " : " + error_message)
-    print ("requested_file : " + requested_file)
-    # return results to client
-    try :
-        clientSock.sendall(requested_file.encode(charset))
-    except OSError :
-        print ("ERROR Sending Requested File")
-        sys.exit ("Exiting Program")
+        except TypeError :
+            error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n"
+            status = "500 Internal Server Error\r\n"
+            requested_file = status + error_message
+            print (status + " : " + error_message)
+        print ("requested_file : " + requested_file)
+        # return results to client
+        try :
+            clientSock.sendall(requested_file.encode(charset))
+        except OSError :
+            print ("ERROR Sending Requested File")
+            sys.exit ("Exiting Program")
 
 
 
