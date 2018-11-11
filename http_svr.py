@@ -173,7 +173,7 @@ while True :
         print ("pure path :" + path)
         #print ("file_name :" + file_name)
         try :
-            with open(path, "r") as file:
+            with open(path) as file:
                 requested_file = file.read()
         except OSError :
             sys.stderr.write("ERROR Reading Requested File : ")
