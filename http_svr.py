@@ -25,8 +25,9 @@ endOf_header = "\r\n\r\n"       # header - body delimiter
 END_RESPONSE = "\r\n\t\r\n\t"
 new_line = "\r\n"               # newline delimiter
 SINGLE_SLASH = "/"
-DEFAULT_PATH = "web_root/index.html"
+DEFAULT_PATH = "web_root/"
 WEB_ROOT = "web_root"
+DEFAULT_FILE = "index.html"
 
 
 
@@ -146,17 +147,19 @@ while True :
         status += endOf_header
 
 
-
-
+    # get the current working directory
+    cwd = os.getcwd()
     # validate requested path
     if path == '/' :
         # empty path provided
         path = DEFAULT_PATH
+        # update the working directory
+        os.chdir(path)
         try :
-            with open(path, "r") as file:
+            with open(DEFAULT_FILE, "r") as file:
                 requested_file = file.read()
         except OSError :
-            print("ERROR Reading Default File : ")
+            sys.stderr.write("ERROR Reading Default File : ")
             status = "404 Not Found"
             status += endOf_header
 
@@ -169,7 +172,7 @@ while True :
             with open(path, "r") as file:
                 requested_file = file.read()
         except OSError :
-            print("ERROR Reading Requested File : ")
+            sys.stderr.write("ERROR Reading Requested File : ")
             status = "404 Not Found"
             status += endOf_header
 
