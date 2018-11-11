@@ -238,6 +238,10 @@ while True :
                             error_message = "ERROR Reading Default File"
                             status = "500 Internal Server Error"
                             print (status + " : " + error_message)
+                        except UnicodeError :
+                            error_message = "ERROR Decoding Data"
+                            status = "500 Internal Server Error"
+                            print (status + " : " + error_message)
 
                     # requested path contains a directory
                     else :
@@ -283,6 +287,10 @@ while True :
                             status = "200 OK"
                         except filename :
                             error_message = "ERROR Reading Requested File"
+                            status = "500 Internal Server Error"
+                            print (status + " : " + error_message)
+                        except UnicodeError :
+                            error_message = "ERROR Decoding Data"
                             status = "500 Internal Server Error"
                             print (status + " : " + error_message)
 
