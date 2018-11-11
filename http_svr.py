@@ -25,8 +25,8 @@ endOf_header = "\r\n\r\n"       # header - body delimiter
 END_RESPONSE = "\r\n\t\r\n\t"
 new_line = "\r\n"               # newline delimiter
 SINGLE_SLASH = "/"
-DEFAULT_PATH = "web_root/"
-WEB_ROOT = "web_root"
+DEFAULT_PATH = "/web_root/"
+WEB_ROOT = "/web_root"
 DEFAULT_FILE = "index.html"
 
 
@@ -168,6 +168,10 @@ while True :
         print ("path else:" + path)
         path = WEB_ROOT + path
         print ("web_root + path :" + path)
+        path = cwd + path
+        #path, file_name = path.rsplit(SINGLE_SLASH, 1)
+        print ("pure path :" + path)
+        #print ("file_name :" + file_name)
         try :
             with open(path, "r") as file:
                 requested_file = file.read()
