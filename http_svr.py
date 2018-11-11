@@ -214,7 +214,7 @@ while True :
                 if x != -1 :
                     try :
                         path = path_protocol[:x]
-                        protocol = path_protocol[x:]
+                        protocol = CLIENT_PROTOCOL
                         path = path.strip()
                         protocol = protocol.strip()
                         print ("path_holder :" + path)
