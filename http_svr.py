@@ -49,6 +49,8 @@ port = 10109                    # Default Port - Assigned Range is 10100 - 10109
 maximum_queue = 1               # Serve Only One Client at a Time
 charset = "UTF-8"               # default encoding protocol
 client_method = "GET"           # acceptable client method
+mime_type = TEXT_TYPE           # default to text/html
+file_name = DEFAULT_FILE
 error_message = NEW_LINE        # default error message for response header
 
 
@@ -239,7 +241,6 @@ while True :
                     if path == SINGLE_SLASH :
                         # empty path provided
                         path = cwd + WEB_ROOT
-                        file_name = DEFAULT_FILE
                         print ("absolute path if :" + path)
 
                         # update the working directory
@@ -249,14 +250,6 @@ while True :
                         except FileNotFoundError :
                             error_message = "ERROR Path Not Found"
                             status = "404 Not Found"
-                            print (status + " : " + error_message)
-
-                        # extract the file type from the filename
-                        try :
-                            file_name_only, file_type = os.path.splitext(file_name)
-                        except OSError :
-                            error_message = "ERROR Unable to Determine FileType"
-                            status = "500 Internal Server Error"
                             print (status + " : " + error_message)
 
                         # get file size and convert to string
@@ -335,6 +328,23 @@ while True :
                             status = "500 Internal Server Error"
                             print (status + " : " + error_message)
 
+                        # set the mime type
+                        try :
+                            if file_type == TEXT_TYPE :
+                                mime_type = TEXT_TYPE
+                            elif file_type == PNG_TYPE :
+                                mime_type = PNG_TYPE
+                            elif file_type == (JPG_TYPE || JPEG_TYPE) :
+                                mime_type = JPG_TYPE
+                            else :
+                                error_message = "ERROR Assigning MIME Type"
+                                status = "500 Internal Server Error"
+                                print (status + " : " + error_message)
+                        except OSError :
+                            error_message = "ERROR Assigning MIME Type"
+                            status = "500 Internal Server Error"
+                            print (status + " : " + error_message)
+
                         # get file size and convert to string
                         try :
                             file_size = os.path.getsize(file_name)
@@ -378,7 +388,7 @@ while True :
         print ("protocol : " + protocol)
         print (protocol + WHITE_SPACE + status + NEW_LINE)
         print (CONTENT_TYPE + ": " \
-                            + file_type \
+                            + mime_type \
                             + SEMI_COLON \
                             + WHITE_SPACE \
                             + CHARSET_FIELD \
@@ -393,7 +403,7 @@ while True :
             status_line =   protocol + WHITE_SPACE + status + NEW_LINE
             content_line =  CONTENT_TYPE        + COLON \
                                                 + WHITE_SPACE \
-                                                + file_type \
+                                                + mime_type \
                                                 + SEMI_COLON \
                                                 + WHITE_SPACE \
                                                 + CHARSET_FIELD \
