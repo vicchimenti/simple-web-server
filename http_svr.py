@@ -254,7 +254,7 @@ while True :
                             with open(DEFAULT_FILE, 'rb') as file:
                                 requested_file = file.read()
                             status = "200 OK"
-                        except filename :
+                        except FileNotFoundError :
                             error_message = "ERROR Reading Default File"
                             status = "500 Internal Server Error"
                             print (status + " : " + error_message)
@@ -300,19 +300,37 @@ while True :
                             status = "404 Not Found"
                             print (status + " : " + error_message)
 
-                        # get file type, length and last-modified
-                        file_name_only, file_type = os.path.splitext(file_name)
-                        file_size = os.path.getsize()
-                        length_str = str(file_size)
-                        modified_date = os.path.getmtime()
+                        # extract the file type from the filename
+                        try :
+                            file_name_only, file_type = os.path.splitext(file_name)
+                        except OSError :
+                            error_message = "ERROR Unable to Determine FileType"
+                            status = "500 Internal Server Error"
+                            print (status + " : " + error_message)
 
+                        # get file size and convert to string
+                        try :
+                            file_size = os.path.getsize(file_name)
+                            length_str = str(file_size)
+                        except OSError :
+                            error_message = "ERROR Obtaining File Size"
+                            status = "500 Internal Server Error"
+                            print (status + " : " + error_message)
+
+                        # get time last modified
+                        try :
+                            modified_date = os.path.getmtime()
+                        except OSError :
+                            error_message = "ERROR Obtaining Modified Time"
+                            status = "500 Internal Server Error"
+                            print (status + " : " + error_message)
 
                         # open the file and assign to a string
                         try :
                             with open(file_name, 'rb') as file:
                                 requested_file = file.read()
                             status = "200 OK"
-                        except filename :
+                        except FileNotFoundError :
                             error_message = "ERROR Reading Requested File"
                             status = "500 Internal Server Error"
                             print (status + " : " + error_message)
@@ -352,27 +370,41 @@ while True :
                                                 + SEMI_COLON \
                                                 + WHITE_SPACE \
                                                 + CHARSET_FIELD \
-                                                + charset
+                                                + charset \
+                                                + NEW_LINE
             date_line =     DATE_FIELD          + COLON \
                                                 + WHITE_SPACE \
-                                                + date_value
+                                                + date_value \
+                                                + NEW_LINE
             modified_line = LAST_MODIFIED_FIELD + COLON \
                                                 + WHITE_SPACE \
-                                                + modified_date
+                                                + modified_date \
+                                                + NEW_LINE
             length_line =   LENGTH_FIELD        + COLON \
                                                 + WHITE_SPACE \
-                                                + length_str
+                                                + length_str \
+                                                + NEW_LINE
             connect_line =  CONNECTION_FIELD    + COLON \
                                                 + WHITE_SPACE \
-                                                + connection_value
-
-
+                                                + connection_value \
+                                                + NEW_LINE
+            reply_header =  status_line         + content_line \
+                                                + date_line \
+                                                + modified_line \
+                                                + length_line \
+                                                + connect_line \
+                                                + END_HEADER
         except TypeError :
             error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n"
             status = "500 Internal Server Error\r\n"
             requested_file = status + error_message
             print (status + " : " + error_message)
-        print ("requested_file : " + requested_file)
+        try :
+            requested_file += (reply_header.encode(charset))
+        except UnicodeError :
+            error_message = "ERROR Encode Reply Header\r\n\r\n".encode(charset)
+            status = "500 Internal Server Error\r\n".encode(charset)
+            requested_file = status + error_message
         # return results to client
         try :
             clientSock.sendall(requested_file.encode(charset))
@@ -380,7 +412,15 @@ while True :
             print ("ERROR Sending Requested File")
             sys.exit ("Exiting Program")
     else:
+        status += NEW_LINE
         error_message += END_HEADER
+        error_response = status + error_message
+        # return error to client
+        try :
+            clientSock.sendall(error_response.encode(charset))
+        except OSError :
+            print ("ERROR Sending Requested File")
+            sys.exit ("Exiting Program")
 
 
 
