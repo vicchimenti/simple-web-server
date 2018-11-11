@@ -141,7 +141,7 @@ while True :
     # reset working directory each iteration
     cwd = server_home
     connection_value = "close"
-    date_value = datetime.datetime.now()
+    date_value = str(datetime.datetime.now())
 
     # initialize header status field
     status = ""
@@ -268,9 +268,9 @@ while True :
                             status = "500 Internal Server Error"
                             print (status + " : " + error_message)
 
-                        # get time last modified
+                        # get time last modified and convert to string
                         try :
-                            modified_date = os.path.getmtime(file_name)
+                            modified_date = str(os.path.getmtime(file_name))
                         except OSError :
                             error_message = "ERROR Obtaining Modified Time"
                             status = "500 Internal Server Error"
@@ -346,7 +346,7 @@ while True :
 
                         # get time last modified
                         try :
-                            modified_date = os.path.getmtime(file_name)
+                            modified_date = str(os.path.getmtime(file_name))
                         except OSError :
                             error_message = "ERROR Obtaining Modified Time"
                             status = "500 Internal Server Error"
