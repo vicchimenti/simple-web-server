@@ -12,6 +12,7 @@
 import socket
 import sys
 import os                       # file and directory information
+import datetime
 
 
 
@@ -22,6 +23,17 @@ NEW_LINE = "\r\n"               # newline delimiter
 SINGLE_SLASH = "/"              # single slash delimiter
 SEMI_COLON = ";"
 COLON = ":"
+CLIENT_PROTOCOL = "HTTP/1.1"    # acceptable client protocol
+CONNECTION_FIELD = "Connection"
+DATE_FIELD = "Date"
+LAST_MODIFIED_FIELD = "Last-Modified"
+CONTENT_LENGTH_FIELD = "Content-Length"
+CONTENT_TYPE = "Content-Type"
+CHARSET_FIELD = "charset="
+TEXT_TYPE = "text/html"
+PNG_TYPE = "image/png"
+JPG_TYPE = "image/jpeg"
+JPEG_TYPE = "image/jpeg"
 WEB_ROOT = "/web_root"
 DEFAULT_FILE = "index.html"
 EXIT_SOCKET = 0
@@ -36,7 +48,6 @@ port = 10109                    # Default Port - Assigned Range is 10100 - 10109
 maximum_queue = 1               # Serve Only One Client at a Time
 charset = "UTF-8"               # default encoding protocol
 client_method = "GET"           # acceptable client method
-CLIENT_PROTOCOL = "HTTP/1.1"    # acceptable client protocol
 error_message = NEW_LINE        # default error message for response header
 
 
@@ -128,6 +139,8 @@ while True :
 
     # reset working directory each iteration
     cwd = server_home
+    connection_value = "close"
+    date_value = datetime.datetime.now()
 
     # initialize header status field
     status = ""
@@ -287,6 +300,13 @@ while True :
                             status = "404 Not Found"
                             print (status + " : " + error_message)
 
+                        # get file type, length and last-modified
+                        file_name_only, file_type = os.path.splitext(file_name)
+                        file_size = os.path.getsize()
+                        length_str = str(file_size)
+                        modified_date = os.path.getmtime()
+
+
                         # open the file and assign to a string
                         try :
                             with open(file_name, 'rb') as file:
@@ -312,6 +332,12 @@ while True :
     print ("status : " + status)
     print ("path : " + path)
     print ("protocol : " + protocol)
+    print (CONTENT_TYPE + " : " + file_type)
+    print (CONTENT_LENGTH_FIELD + " : " + length_str)
+    print (LAST_MODIFIED_FIELD + " : " + modified_date)
+    print (CONNECTION_FIELD + " : " + connection_value)
+    print (DATE_FIELD + " : " + date_value)
+    print (DATE_FIELD + " : " + date_value)
     try :
         status = protocol + WHITE_SPACE + status + NEW_LINE
         error_message += END_HEADER
