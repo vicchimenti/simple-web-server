@@ -150,13 +150,14 @@ while True :
     # get the current working directory
     cwd = os.getcwd()
     # validate requested path
-    if path == '/' :
+    if path == SINGLE_SLASH :
         # empty path provided
         path = DEFAULT_PATH
+        path = cwd + path
         # update the working directory
         os.chdir(path)
         try :
-            with open(DEFAULT_FILE, "r") as file:
+            with open(DEFAULT_FILE, 'rb') as file:
                 requested_file = file.read()
         except OSError :
             sys.stderr.write("ERROR Reading Default File : ")
@@ -182,7 +183,7 @@ while True :
             status = "404 Not Found"
             status += endOf_header
         try :
-            with open(file_name, 'r') as file:
+            with open(file_name, 'rb') as file:
                 requested_file = file.read()
             status = "200 OK"
             status += endOf_header
