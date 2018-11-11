@@ -293,10 +293,16 @@ while True :
     print ("error message : " + error_message)
     print ("status : " + status)
     print ("path : " + path)
-    status += NEW_LINE
-    error_message += END_HEADER
-    requested_file += NEW_LINE
-    requested_file = status + error_message + requested_file
+    try :
+        status += NEW_LINE
+        error_message += END_HEADER
+        requested_file += NEW_LINE
+        requested_file = status + error_message + requested_file
+    except TypeError :
+        error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n"
+        status = "500 Internal Server Error\r\n"
+        requested_file = status + error_message
+        print (status + " : " + error_message)
     print ("requested_file : " + requested_file)
     # return results to client
     try :
@@ -308,9 +314,9 @@ while True :
 
 
 
-        # Close the Client Socket
-        clientSock.close()
-        print ("Listening for Next Client on Port Number : " + user_input)
+    # Close the Client Socket
+    clientSock.close()
+    print ("Listening for Next Client on Port Number : " + user_input)
 
 
 
