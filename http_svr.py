@@ -36,6 +36,7 @@ JPG_TYPE = "image/jpeg"
 JPEG_TYPE = "image/jpeg"
 WEB_ROOT = "/web_root"
 DEFAULT_FILE = "index.html"
+DEFAULT_FILE_TYPE = "html"
 EXIT_SOCKET = 0
 MAL_SET = "/../"
 WHITE_SPACE = " "
@@ -247,6 +248,31 @@ while True :
                         except FileNotFoundError :
                             error_message = "ERROR Path Not Found"
                             status = "404 Not Found"
+                            print (status + " : " + error_message)
+
+                        # extract the file type from the filename
+                        try :
+                            file_name_only, file_type = os.path.splitext(file_name)
+                        except OSError :
+                            error_message = "ERROR Unable to Determine FileType"
+                            status = "500 Internal Server Error"
+                            print (status + " : " + error_message)
+
+                        # get file size and convert to string
+                        try :
+                            file_size = os.path.getsize(file_name)
+                            length_str = str(file_size)
+                        except OSError :
+                            error_message = "ERROR Obtaining File Size"
+                            status = "500 Internal Server Error"
+                            print (status + " : " + error_message)
+
+                        # get time last modified
+                        try :
+                            modified_date = os.path.getmtime(file_name)
+                        except OSError :
+                            error_message = "ERROR Obtaining Modified Time"
+                            status = "500 Internal Server Error"
                             print (status + " : " + error_message)
 
                         # open the file and assign to a string
