@@ -136,7 +136,7 @@ while True :
     if x != -1 :
         try :
             path = path_protocol[:x]
-            path = path.lstrip()
+            path = path.strip()
             print ("path_holder :" + path)
         except OSError :
             sys.stderr.write("ERROR Unable to Strip Protocol : ")
