@@ -22,6 +22,11 @@ maximum_queue = 1               # Serve Only One Client at a Time
 charset = "UTF-8"               # default encoding protocol
 client_method = "GET"           # acceptable client method
 client_protocol = "HTTP/1.1"    # acceptable client protocol
+
+
+
+
+# set constants
 END_HEADER = "\r\n\r\n"         # header - body delimiter
 NEW_LINE = "\r\n"               # newline delimiter
 SINGLE_SLASH = "/"              # single slash delimiter
@@ -107,13 +112,13 @@ while True :
     except ConnectionError :
         print ("ERROR Unable to Connect with Client")
         status = "500 Internal Server Error"
+        status += END_HEADER
         EXIT_SOCKET = 1
 
     # proceed when exit socket is not active
     if EXIT_SOCKET == 0 :
 
-        # initialize header status field
-        requested_file = ""
+        # initialize message receive string
         client_message = ""
 
         # receive request
@@ -170,6 +175,8 @@ while True :
 
         # get the current working directory
         cwd = os.getcwd()
+        # initialize the file string
+        requested_file = ""
         # validate requested path
         if path == SINGLE_SLASH :
             # empty path provided
