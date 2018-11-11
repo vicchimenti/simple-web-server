@@ -334,8 +334,10 @@ while True :
                                 mime_type = TEXT_TYPE
                             elif file_type == PNG_TYPE :
                                 mime_type = PNG_TYPE
-                            elif file_type == (JPG_TYPE || JPEG_TYPE) :
+                            elif file_type == JPG_TYPE :
                                 mime_type = JPG_TYPE
+                            elif file_type == JPEG_TYPE :
+                                mime_type = JPEG_TYPE
                             else :
                                 error_message = "ERROR Assigning MIME Type"
                                 status = "500 Internal Server Error"
