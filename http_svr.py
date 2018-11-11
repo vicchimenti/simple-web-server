@@ -34,6 +34,10 @@ TEXT_TYPE = "text/html"
 PNG_TYPE = "image/png"
 JPG_TYPE = "image/jpeg"
 JPEG_TYPE = "image/jpeg"
+TEXT_FIELD = "html"
+PNG_FIELD = "png"
+JPG_FIELD = "jpg"
+JPEG_FIELD = "jpeg"
 WEB_ROOT = "/web_root"
 DEFAULT_FILE = "index.html"
 DEFAULT_FILE_TYPE = "html"
@@ -332,13 +336,13 @@ while True :
 
                         # set the mime type
                         try :
-                            if file_type == TEXT_TYPE :
+                            if file_type == TEXT_FIELD :
                                 mime_type = TEXT_TYPE
-                            elif file_type == PNG_TYPE :
+                            elif file_type == PNG_FIELD :
                                 mime_type = PNG_TYPE
-                            elif file_type == JPG_TYPE :
+                            elif file_type == JPG_FIELD :
                                 mime_type = JPG_TYPE
-                            elif file_type == JPEG_TYPE :
+                            elif file_type == JPEG_FIELD :
                                 mime_type = JPEG_TYPE
                             else :
                                 error_message = "ERROR Assigning MIME Type"
