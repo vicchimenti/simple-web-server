@@ -168,13 +168,19 @@ while True :
         print ("path else:" + path)
         path = WEB_ROOT + path
         print ("web_root + path :" + path)
+        #path = cwd + path
+        path, file_name = path.rsplit(SINGLE_SLASH, 1)
         path = cwd + path
-        #path, file_name = path.rsplit(SINGLE_SLASH, 1)
         print ("pure path :" + path)
-        #print ("file_name :" + file_name)
+        print ("file_name :" + file_name)
+        os.chdir(path)
         try :
-            with open(path) as file:
-                requested_file = file.read()
+            file = open(file_name, 'r')
+            requested_file = file.read()
+            #with open(file_name, 'r') as file:
+            #    requested_file = file.read()
+            status = "200 OK"
+            status += endOf_header
         except OSError :
             sys.stderr.write("ERROR Reading Requested File : ")
             status = "404 Not Found"
@@ -189,7 +195,7 @@ while True :
     # send file to client
     print ("status : " + status)
     print ("path : " + path)
-    requested_file += endOf_header
+    requested_file += new_line
     requested_file = status + requested_file
     print ("requested_file : " + requested_file)
 
