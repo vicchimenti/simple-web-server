@@ -187,12 +187,19 @@ while True :
                         path = path.strip()
                         print ("path_holder :" + path)
                     except OSError :
-                        sys.stderr.write("ERROR Unable to Strip Protocol : ")
+                        error_message = "ERROR Unable to Strip Protocol"
                         status = "400 Bad Request"
-                        status += END_HEADER
+                        print (status + " : " + error_message)
+                        EXIT_SOCKET = 4
                 else :
+                    error_message = "ERROR Not a Valid HTTP Request"
                     status = "400 Bad Request"
-                    status += END_HEADER
+                    print (status + " : " + error_message)
+                    EXIT_SOCKET = 4
+
+
+
+                if EXIT_SOCKET == 0 :
 
 
                 # get the current working directory
