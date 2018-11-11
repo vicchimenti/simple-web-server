@@ -37,6 +37,7 @@ JPEG_TYPE = "image/jpeg"
 WEB_ROOT = "/web_root"
 DEFAULT_FILE = "index.html"
 DEFAULT_FILE_TYPE = "html"
+HEADER_SIZE = 20
 EXIT_SOCKET = 0
 MAL_SET = "/../"
 WHITE_SPACE = " "
@@ -255,6 +256,7 @@ while True :
                         # get file size and convert to string
                         try :
                             file_size = os.path.getsize(file_name)
+                            file_size += HEADER_SIZE
                             length_str = str(file_size)
                         except OSError :
                             error_message = "ERROR Obtaining File Size"
@@ -350,6 +352,7 @@ while True :
                         # get file size and convert to string
                         try :
                             file_size = os.path.getsize(file_name)
+                            file_size += HEADER_SIZE
                             length_str = str(file_size)
                         except OSError :
                             error_message = "ERROR Obtaining File Size"
@@ -438,18 +441,32 @@ while True :
             status = "500 Internal Server Error\r\n"
             requested_file = status + error_message
             print (status + " : " + error_message)
+
+
+
+        # encode header and append to requested file
         try :
-            requested_file += (reply_header.encode(charset))
+            header_in_bytes = reply_header.encode(charset)
+            response = header_in_bytes + requested_file
         except UnicodeError :
             error_message = "ERROR Encode Reply Header\r\n\r\n".encode(charset)
             status = "500 Internal Server Error\r\n".encode(charset)
             requested_file = status + error_message
+
+
+
+
         # return results to client
         try :
-            clientSock.sendall(requested_file)
+            clientSock.sendall(response)
         except OSError :
             print ("ERROR Sending Requested File")
             sys.exit ("Exiting Program")
+
+
+
+
+    # return an error response
     else:
         status += NEW_LINE
         error_message += END_HEADER
