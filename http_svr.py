@@ -20,10 +20,13 @@ import os                       # file and directory information
 END_HEADER = "\r\n\r\n"         # header - body delimiter
 NEW_LINE = "\r\n"               # newline delimiter
 SINGLE_SLASH = "/"              # single slash delimiter
+SEMI_COLON = ";"
+COLON = ":"
 WEB_ROOT = "/web_root"
 DEFAULT_FILE = "index.html"
 EXIT_SOCKET = 0
 MAL_SET = "/../"
+WHITE_SPACE = " "
 
 
 
@@ -33,8 +36,9 @@ port = 10109                    # Default Port - Assigned Range is 10100 - 10109
 maximum_queue = 1               # Serve Only One Client at a Time
 charset = "UTF-8"               # default encoding protocol
 client_method = "GET"           # acceptable client method
-client_protocol = "HTTP/1.1"    # acceptable client protocol
+CLIENT_PROTOCOL = "HTTP/1.1"    # acceptable client protocol
 error_message = NEW_LINE        # default error message for response header
+
 
 
 
@@ -188,13 +192,16 @@ while True :
             if EXIT_SOCKET == 0 :
 
                 #if protocol is HTTP parse path from message
-                x = path_protocol.find (client_protocol)
+                x = path_protocol.find (CLIENT_PROTOCOL)
                 # if request is in HTTP format
                 if x != -1 :
                     try :
                         path = path_protocol[:x]
+                        protocol = path_protocol[x:]
                         path = path.strip()
+                        protocol = protocol.strip()
                         print ("path_holder :" + path)
+                        print ("protocol :" + protocol)
                     except IndexError :
                         error_message = "ERROR Unable to Strip Protocol"
                         status = "400 Bad Request"
@@ -231,7 +238,7 @@ while True :
 
                         # open the file and assign to a string
                         try :
-                            with open(DEFAULT_FILE, 'r') as file:
+                            with open(DEFAULT_FILE, 'rb') as file:
                                 requested_file = file.read()
                             status = "200 OK"
                         except filename :
@@ -282,7 +289,7 @@ while True :
 
                         # open the file and assign to a string
                         try :
-                            with open(file_name, 'r') as file:
+                            with open(file_name, 'rb') as file:
                                 requested_file = file.read()
                             status = "200 OK"
                         except filename :
@@ -304,8 +311,9 @@ while True :
     print ("error message : " + error_message)
     print ("status : " + status)
     print ("path : " + path)
+    print ("protocol : " + protocol)
     try :
-        status += NEW_LINE
+        status = protocol + WHITE_SPACE + status + NEW_LINE
         error_message += END_HEADER
         requested_file += NEW_LINE
         requested_file = status + error_message + requested_file
