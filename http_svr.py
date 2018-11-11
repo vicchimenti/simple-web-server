@@ -461,10 +461,14 @@ while True :
 
 
     # Close the Client Socket
+    print ("Response Sent : Closing Client Socket")
     clientSock.close()
     print ("Listening for Next Client on Port Number : " + user_input)
 
-
+# TODO :    look at last modified time
+#           review error checking
+#           review assignment requirements
+#           move to cs2 and test with commercial browser
 
 
 
