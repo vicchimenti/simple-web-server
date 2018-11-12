@@ -71,6 +71,11 @@ exit_socket = 0                 # decision tree default status
 
 
 
+# ***************    System Set Up for Socket   ***************************** #
+
+
+
+
 # establish working directory
 try :
     server_home = os.getcwd()
@@ -145,13 +150,17 @@ except ConnectionError :
     print (error_message)
     sys.exit ("Exiting Program")
 
-# print confirmation of listening socket
+# print confirmation of active listening socket
 print ("Listening for Client on Port Number : " + user_input)
 
 
 
 
-# open client sockets and exchange messages
+# **************   open client sockets and exchange messages   *************** #
+
+
+
+# establish client socket loop
 while True :
 
     # reset working directory each iteration
