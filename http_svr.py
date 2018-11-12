@@ -50,7 +50,7 @@ HEADER_SIZE = 20                        # max header size
 
 # *****   set constants for request parsing   ***
 CLIENT_PROTOCOL = "HTTP/1.1"            # acceptable client protocol
-DEFAULT_FILE_TYPE = TEXT_FIELD          # when no file type is indicated
+DEFAULT_FILE_TYPE = TEXT_MATCH          # when no file type is indicated
 DEFAULT_FILE = "index.html"             # when no path is provided
 WEB_ROOT = "/web_root"                  # for internal path routing
 MAL_SET = "/../"                        # malware delimiter
@@ -336,13 +336,13 @@ while True :
 
                         # set the mime type
                         try :
-                            if file_type == TEXT_FIELD :
+                            if file_type == TEXT_MATCH :
                                 mime_type = TEXT_TYPE
-                            elif file_type == PNG_FIELD :
+                            elif file_type == PNG_MATCH :
                                 mime_type = PNG_TYPE
-                            elif file_type == JPG_FIELD :
+                            elif file_type == JPG_MATCH :
                                 mime_type = JPG_TYPE
-                            elif file_type == JPEG_FIELD :
+                            elif file_type == JPEG_MATCH :
                                 mime_type = JPEG_TYPE
                             else :
                                 error_message = "ERROR Assigning MIME Type"
