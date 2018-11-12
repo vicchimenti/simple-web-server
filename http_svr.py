@@ -208,21 +208,29 @@ while True :
             # Display the Client Request
             print ("Client Request :\n" + client_message)
 
-            # parse and process client request
-            x = client_message.find (client_method)
-            # if request is approved method then begin processing
+            # scan for malware
+            x = client_message.find (MAL_SET)
             if x != -1 :
-                try :
-                    get_request, path_protocol = \
-                        client_message.split(client_method, 2)
-                except IndexError :
-                    error_message = "ERROR Unable to Strip Request Type"
+                # parse and process client request
+                x = client_message.find (client_method)
+                # if request is approved method then begin processing
+                if x != -1 :
+                    try :
+                        get_request, path_protocol = \
+                            client_message.split(client_method, 2)
+                    except IndexError :
+                        error_message = "ERROR Unable to Strip Request Type"
+                        status = "501 Not Implemented"
+                        print (status + " : " + error_message)
+                        EXIT_SOCKET = 3
+                else :
+                    error_message = "ERROR Invalid Request Type"
                     status = "501 Not Implemented"
                     print (status + " : " + error_message)
                     EXIT_SOCKET = 3
             else :
-                error_message = "ERROR Invalid Request Type"
-                status = "501 Not Implemented"
+                error_message = "ERROR Invalid Request Attempt"
+                status = "400 Bad Request"
                 print (status + " : " + error_message)
                 EXIT_SOCKET = 3
 
