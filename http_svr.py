@@ -9,55 +9,64 @@
 
 
 
-import socket
-import sys
-import os                       # file and directory information
-import datetime
+import socket       # TCP Socket Operations
+import sys          # System Calls
+import os           # File and Directory Information
+import datetime     # System Time
 
 
 
 
-# set constants
-END_HEADER = "\r\n\r\n"         # header - body delimiter
-NEW_LINE = "\r\n"               # newline delimiter
-SINGLE_SLASH = "/"              # single slash delimiter
-SEMI_COLON = ";"
-COLON = ":"
-CLIENT_PROTOCOL = "HTTP/1.1"    # acceptable client protocol
-CONNECTION_FIELD = "Connection"
-DATE_FIELD = "Date"
-LAST_MODIFIED_FIELD = "Last-Modified"
-LENGTH_FIELD = "Content-Length"
-CONTENT_TYPE = "Content-Type"
-CHARSET_FIELD = "charset="
-TEXT_TYPE = "text/html"
-PNG_TYPE = "image/png"
-JPG_TYPE = "image/jpeg"
-JPEG_TYPE = "image/jpeg"
-TEXT_FIELD = ".html"
-PNG_FIELD = ".png"
-JPG_FIELD = ".jpg"
-JPEG_FIELD = ".jpeg"
-WEB_ROOT = "/web_root"
-DEFAULT_FILE = "index.html"
-DEFAULT_FILE_TYPE = "html"
-HEADER_SIZE = 20
-EXIT_SOCKET = 0
-MAL_SET = "/../"
-WHITE_SPACE = " "
+# *****   set constants for grammar   ***
+END_HEADER = "\r\n\r\n"                 # header - body delimiter
+NEW_LINE = "\r\n"                       # newline delimiter
+SINGLE_SLASH = "/"                      # single slash delimiter
+SEMI_COLON = ";"                        # semicolon delimiter
+COLON = ":"                             # colon delimiter
+WHITE_SPACE = " "                       # single whitespace
 
 
 
 
-# set defaults
+#  *****   set constants for building and formatting the response header   ***
+LAST_MODIFIED_FIELD = "Last-Modified"   # contains date of last modification
+CONNECTION_FIELD = "Connection"         # contains server connection status
+LENGTH_FIELD = "Content-Length"         # contains length of http response
+CONTENT_FIELD = "Content-Type"          # contains the file type
+CHARSET_FIELD = "charset="              # contains the decoding protocol
+DATE_FIELD = "Date"                     # contains the system date
+TEXT_MATCH = ".html"                    # matches html file type
+PNG_MATCH = ".png"                      # matches png file type
+JPG_MATCH = ".jpg"                      # matches jpg file type
+JPEG_MATCH = ".jpeg"                    # matches jpeg file type
+TEXT_TYPE = "text/html"                 # http text message type
+PNG_TYPE = "image/png"                  # http png message type
+JPG_TYPE = "image/jpeg"                 # http jpg message type
+JPEG_TYPE = "image/jpeg"                # http jpeg message type
+HEADER_SIZE = 20                        # max header size
+
+
+
+
+# *****   set constants for request parsing   ***
+CLIENT_PROTOCOL = "HTTP/1.1"            # acceptable client protocol
+DEFAULT_FILE_TYPE = TEXT_FIELD          # when no file type is indicated
+DEFAULT_FILE = "index.html"             # when no path is provided
+WEB_ROOT = "/web_root"                  # for internal path routing
+MAL_SET = "/../"                        # malware delimiter
+
+
+
+
+# initialize default values
 port = 10109                    # Default Port - Assigned Range is 10100 - 10109
 maximum_queue = 1               # Serve Only One Client at a Time
 charset = "UTF-8"               # default encoding protocol
 client_method = "GET"           # acceptable client method
 mime_type = TEXT_TYPE           # default to text/html
-file_name = DEFAULT_FILE
+file_name = DEFAULT_FILE        # file name initializes to index.html
 error_message = NEW_LINE        # default error message for response header
-
+exit_socket = 0                 # decision tree default status
 
 
 
@@ -384,7 +393,7 @@ while True :
         # prep results for delivery
         try :
             status_line =   protocol + WHITE_SPACE + status + NEW_LINE
-            content_line =  CONTENT_TYPE        + COLON \
+            content_line =  CONTENT_FIELD        + COLON \
                                                 + WHITE_SPACE \
                                                 + mime_type \
                                                 + SEMI_COLON \
