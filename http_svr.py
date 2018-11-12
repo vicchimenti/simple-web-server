@@ -51,7 +51,7 @@ HEADER_SIZE = 20                        # max header size
 # *****   set constants for request parsing   ***
 CLIENT_PROTOCOL = "HTTP/1.1"            # acceptable client protocol
 DEFAULT_FILE_TYPE = TEXT_MATCH          # when no file type is indicated
-DEFAULT_FILE = "index.html"             # when no path is provided
+DEFAULT_FILE = "/index.html"             # when no path is provided
 WEB_ROOT = "/web_root"                  # for internal path routing
 MAL_SET = "/../"                        # malware delimiter
 
@@ -211,6 +211,14 @@ while True :
             # scan for malware
             x = client_message.find (MAL_SET)
             if x != -1 :
+                # when mal script is present through error message
+                error_message = "ERROR Invalid Request Attempt"
+                status = "400 Bad Request"
+                print (status + " : " + error_message)
+                exit_socket = 3
+
+            # if clear of mal script continue
+            else :
                 # parse and process client request
                 x = client_message.find (client_method)
                 # if request is approved method then begin processing
@@ -228,11 +236,7 @@ while True :
                     status = "501 Not Implemented"
                     print (status + " : " + error_message)
                     exit_socket = 3
-            else :
-                error_message = "ERROR Invalid Request Attempt"
-                status = "400 Bad Request"
-                print (status + " : " + error_message)
-                exit_socket = 3
+
 
 
             # proceed when exit socket is not active
@@ -274,7 +278,6 @@ while True :
                         # update the working directory
                         try :
                             os.chdir(path)
-                            print(os.getcwd())
                         except FileNotFoundError :
                             error_message = "ERROR Path Not Found"
                             status = "404 Not Found"
@@ -382,7 +385,8 @@ while True :
 
                         # get time last modified
                         try :
-                            modified_date = str(os.path.getmtime(file_name))
+                            md = os.path.getmtime(file_name)
+                            modified_date = md
                         except OSError :
                             error_message = "ERROR Obtaining Modified Time"
                             status = "500 Internal Server Error"
@@ -410,7 +414,7 @@ while True :
         # prep results for delivery
         try :
             status_line =   protocol + WHITE_SPACE + status + NEW_LINE
-            content_line =  CONTENT_FIELD        + COLON \
+            content_line =  CONTENT_FIELD       + COLON \
                                                 + WHITE_SPACE \
                                                 + mime_type \
                                                 + SEMI_COLON \
