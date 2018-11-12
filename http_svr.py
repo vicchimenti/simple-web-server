@@ -179,10 +179,10 @@ while True :
         error_message = "ERROR Unable to Connect with Client"
         status = "500 Internal Server Error"
         print (status + " : " + error_message)
-        EXIT_SOCKET = 1
+        exit_socket = 1
 
     # proceed when exit socket is not active
-    if EXIT_SOCKET == 0 :
+    if exit_socket == 0 :
 
         # initialize message receive string
         client_message = ""
@@ -198,12 +198,12 @@ while True :
                 error_message = "ERROR Receiving Client Message"
                 status = "500 Internal Error"
                 print (status + " : " + error_message)
-                EXIT_SOCKET = 2
+                exit_socket = 2
 
 
 
         # proceed when exit socket is not active
-        if EXIT_SOCKET == 0 :
+        if exit_socket == 0 :
 
             # Display the Client Request
             print ("Client Request :\n" + client_message)
@@ -222,21 +222,21 @@ while True :
                         error_message = "ERROR Unable to Strip Request Type"
                         status = "501 Not Implemented"
                         print (status + " : " + error_message)
-                        EXIT_SOCKET = 3
+                        exit_socket = 3
                 else :
                     error_message = "ERROR Invalid Request Type"
                     status = "501 Not Implemented"
                     print (status + " : " + error_message)
-                    EXIT_SOCKET = 3
+                    exit_socket = 3
             else :
                 error_message = "ERROR Invalid Request Attempt"
                 status = "400 Bad Request"
                 print (status + " : " + error_message)
-                EXIT_SOCKET = 3
+                exit_socket = 3
 
 
             # proceed when exit socket is not active
-            if EXIT_SOCKET == 0 :
+            if exit_socket == 0 :
 
                 #if protocol is HTTP parse path from message
                 x = path_protocol.find (CLIENT_PROTOCOL)
@@ -251,17 +251,17 @@ while True :
                         error_message = "ERROR Unable to Strip Protocol"
                         status = "400 Bad Request"
                         print (status + " : " + error_message)
-                        EXIT_SOCKET = 4
+                        exit_socket = 4
                 else :
                     error_message = "ERROR Not a Valid HTTP Request"
                     status = "400 Bad Request"
                     print (status + " : " + error_message)
-                    EXIT_SOCKET = 4
+                    exit_socket = 4
 
 
 
                 # proceed when exit socket is not active
-                if EXIT_SOCKET == 0 :
+                if exit_socket == 0 :
 
                     # initialize the file string
                     requested_file = ""
