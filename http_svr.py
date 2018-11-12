@@ -202,6 +202,7 @@ while True :
 
 
 
+
         # proceed when exit socket is not active
         if exit_socket == 0 :
 
@@ -211,6 +212,12 @@ while True :
             # scan for malware
             x = client_message.find (MAL_SET)
             if x != -1 :
+                error_message = "ERROR Invalid Request Attempt"
+                status = "400 Bad Request"
+                print (status + " : " + error_message)
+                exit_socket = 3
+
+            else :
                 # parse and process client request
                 x = client_message.find (client_method)
                 # if request is approved method then begin processing
@@ -228,11 +235,8 @@ while True :
                     status = "501 Not Implemented"
                     print (status + " : " + error_message)
                     exit_socket = 3
-            else :
-                error_message = "ERROR Invalid Request Attempt"
-                status = "400 Bad Request"
-                print (status + " : " + error_message)
-                exit_socket = 3
+
+
 
 
             # proceed when exit socket is not active
