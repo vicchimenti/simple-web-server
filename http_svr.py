@@ -323,10 +323,10 @@ while True :
                     # requested path contains a directory
                     else :
                         # check for file extension
-                        if (TEXT_MATCH or PNG_MATCH \
-                                       or JPG_MATCH \
-                                       or JPEG_MATCH) in path :
-                            path += file_name
+                        if (TEXT_MATCH or PNG_MATCH or JPG_MATCH or JPEG_MATCH) not in path :
+                            path += SINGLE_SLASH + file_name
+
+                        print ("path-filename : " + path)
 
                         # client provided path
                         path = WEB_ROOT + path
