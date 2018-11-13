@@ -248,6 +248,10 @@ while True :
                 if x != -1 :
                     try :
                         path = path_protocol[:x]
+                        # local protocal var for future portability incase other
+                        # protocols become acceptable. For now protocal is
+                        # asigned by default contstant instead of slicing
+                        # protocol = path_protocol[x:]
                         protocol = CLIENT_PROTOCOL
                         path = path.strip()
                         protocol = protocol.strip()
@@ -318,6 +322,12 @@ while True :
 
                     # requested path contains a directory
                     else :
+                        # check for file extension
+                        if (TEXT_MATCH or PNG_MATCH \
+                                       or JPG_MATCH \
+                                       or JPEG_MATCH) in path :
+                            path += file_name
+
                         # client provided path
                         path = WEB_ROOT + path
                         path = cwd + path
@@ -331,7 +341,7 @@ while True :
                             print (status + " : " + error_message)
 
                         # strip the file name of any trailing whitespace
-                        try:
+                        try :
                             file_name = file_name.rstrip()
                         except IndexError :
                             error_message = \
