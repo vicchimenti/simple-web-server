@@ -163,14 +163,24 @@ print ("Listening for Client on Port Number : " + user_input)
 while True :
 
     # reset working directory each iteration
-    cwd = server_home
-    connection_value = "close"
-    date_value = str(datetime.datetime.now())
-    requested_file = Bytes
+    try :
+        os.chdir(server_home)
+    except FileNotFoundError :
+        error_message = "ERROR Path Not Found"
+        status = "404 Not Found"
+        print (status + " : " + error_message)
+        exit_socket = 1
 
-    # initialize header status field
+    # initialize header fields
+    connection_value = "close"
     status = ""
 
+    # initialize socket for new client
+    date_value = str(datetime.datetime.now())
+    requested_file = bytearray()
+    cwd = getcwd()
+
+    # connect to client
     try :
         (clientSock, address) = sock.accept()
         addr_str = str (address)
@@ -180,6 +190,9 @@ while True :
         status = "500 Internal Server Error"
         print (status + " : " + error_message)
         exit_socket = 1
+
+
+
 
     # proceed when exit socket is not active
     if exit_socket == 0 :
@@ -349,7 +362,7 @@ while True :
 
 
 
-                    # gather file information and extract data
+                    # gather file information and store for header
                     if exit_socket == 0 :
 
                         # extract the file type from the filename
@@ -359,6 +372,7 @@ while True :
                             error_message = "ERROR Unable to Determine FileType"
                             status = "500 Internal Server Error"
                             print (status + " : " + error_message)
+                            exit_socket = 6
 
                         # set the mime type
                         try :
@@ -378,6 +392,7 @@ while True :
                             error_message = "ERROR Assigning MIME Type"
                             status = "500 Internal Server Error"
                             print (status + " : " + error_message)
+                            exit_socket = 6
 
                         # get file size and convert to string
                         try :
@@ -388,6 +403,7 @@ while True :
                             error_message = "ERROR Obtaining File Size"
                             status = "500 Internal Server Error"
                             print (status + " : " + error_message)
+                            exit_socket = 6
 
                         # get time last modified
                         try :
@@ -396,20 +412,29 @@ while True :
                             error_message = "ERROR Obtaining Modified Time"
                             status = "500 Internal Server Error"
                             print (status + " : " + error_message)
+                            exit_socket = 6
 
-                        # open the file and assign to a string
-                        try :
-                            with open(file_name, 'rb') as file:
-                                requested_file = file.read()
-                            status = "200 OK"
-                        except FileNotFoundError :
-                            error_message = "ERROR Reading Requested File"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
-                        except UnicodeError :
-                            error_message = "ERROR Decoding Data"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
+
+
+
+                        # open file and stream data
+                        if exit_socket == 0 :
+
+                            # open the file and assign to a string
+                            try :
+                                with open(file_name, 'rb') as file:
+                                    requested_file = file.read()
+                                status = "200 OK"
+                            except FileNotFoundError :
+                                error_message = "ERROR Reading Requested File"
+                                status = "500 Internal Server Error"
+                                print (status + " : " + error_message)
+                                exit_socket = 7
+                            except UnicodeError :
+                                error_message = "ERROR Decoding Data"
+                                status = "500 Internal Server Error"
+                                print (status + " : " + error_message)
+                                exit_socket = 7
 
 
 
@@ -483,9 +508,10 @@ while True :
 
     # return an error response
     else:
-        status += NEW_LINE
-        error_message += END_HEADER
-        error_response = status + error_message
+        status += END_HEADER
+        exit_code = str(exit_socket)
+        error_response = status
+        print (error_response + error_message + exit_code)
         # return error to client
         try :
             clientSock.sendall(error_response.encode(charset))
