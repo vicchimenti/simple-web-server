@@ -162,14 +162,15 @@ print ("Listening for Client on Port Number : " + user_input)
 while True :
 
     # reset client defaults
+    cwd = server_home
     exit_socket = 0
-    error_message = ""
+    error_message = NEW_LINE
     date_value = str(datetime.datetime.now())
-    requested_file = bytearray()
+    requested_file = ""
 
     # reset working directory each iteration
     try :
-        os.chdir(server_home)
+        os.chdir(cwd)
     except FileNotFoundError :
         error_message = "ERROR Path Not Found"
         status = "404 Not Found"
@@ -178,7 +179,7 @@ while True :
     # initialize header fields
     connection_value = "close"
     status = ""
-    cwd = os.getcwd()
+
 
     # connect to client
     try :
