@@ -394,6 +394,7 @@ while True :
                             #TODO: fix
                             #   Last-Modified:
                             #       datetime.datetime(2018, 11, 10, 19, 51, 57)
+                            # https://www.saltycrane.com/blog/2008/11/python-datetime-time-conversions/
 
                             #md = str(os.path.getmtime(file_name))
                             #t = int(md)
