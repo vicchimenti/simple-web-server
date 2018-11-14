@@ -3,7 +3,7 @@
 # http_svr.py
 # A Simple Web Server in Python3
 # Created           10/30/2018
-# Last Modified     11/13/2018
+# Last Modified     11/14/2018
 # /usr/local/python3/bin/python3
 
 
@@ -386,7 +386,8 @@ while True :
 
                         # get time last modified
                         try :
-                            modified_date = str(os.path.getmtime(file_name))
+                            md = str(os.path.getmtime(file_name))
+                            modified_date = datetime.datetime.fromtimestamp(md)
                         except OSError :
                             error_message = "ERROR Obtaining Modified Time"
                             status = "500 Internal Server Error"
