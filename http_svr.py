@@ -178,7 +178,7 @@ while True :
     # initialize socket for new client
     date_value = str(datetime.datetime.now())
     requested_file = bytearray()
-    cwd = getcwd()
+    cwd = os.getcwd()
 
     # connect to client
     try :
