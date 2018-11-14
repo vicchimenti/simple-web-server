@@ -3,7 +3,7 @@
 # http_svr.py
 # A Simple Web Server in Python3
 # Created           10/30/2018
-# Last Modified     11/12/2018
+# Last Modified     11/13/2018
 # /usr/local/python3/bin/python3
 
 
@@ -64,7 +64,6 @@ maximum_queue = 1               # Serve Only One Client at a Time
 charset = "UTF-8"               # default encoding protocol
 client_method = "GET"           # acceptable client method
 mime_type = TEXT_TYPE           # default to text/html
-file_name = DEFAULT_FILE        # file name initializes to index.html
 error_message = NEW_LINE        # default error message for response header
 exit_socket = 0                 # decision tree default status
 
@@ -203,7 +202,7 @@ while True :
 
 
 
-        # proceed when exit socket is not active
+        # begin parsing request when exit socket is not active
         if exit_socket == 0 :
 
             # Display the Client Request
@@ -217,6 +216,7 @@ while True :
                 print (status + " : " + error_message)
                 exit_socket = 3
 
+            # when no mal script present
             else :
                 # parse and process client request
                 x = client_message.find (client_method)
@@ -239,7 +239,7 @@ while True :
 
 
 
-            # proceed when exit socket is not active
+            # parse the pathway from the request protocol
             if exit_socket == 0 :
 
                 #if protocol is HTTP parse path from message
@@ -273,11 +273,18 @@ while True :
 
                     # initialize the file string
                     requested_file = ""
-
+                    path = cwd + WEB_ROOT + path
                     # requested path is empty
                     if path == SINGLE_SLASH :
-                        # empty path provided
-                        path = cwd + WEB_ROOT
+                        # empty path provided so file name initializes to index.html
+                        file_name = DEFAULT_FILE
+                    # requested path contains a directory then check for file extension
+                    elif path.lower().endswith((TEXT_MATCH, PNG_MATCH, JPG_MATCH, JPEG_MATCH)) :
+
+                        print ("path-filename : " + path)
+
+                        # client provided path
+                        path = cwd + WEB_ROOT + path
 
                         # update the working directory
                         try :
@@ -320,17 +327,14 @@ while True :
                             status = "500 Internal Server Error"
                             print (status + " : " + error_message)
 
-                    # requested path contains a directory
-                    else :
-                        # check for file extension
-                        if (TEXT_MATCH or PNG_MATCH or JPG_MATCH or JPEG_MATCH) not in path :
-                            path += SINGLE_SLASH + file_name
+                    # requested path contains a directory then check for file extension
+                    elif path.lower().endswith((TEXT_MATCH, PNG_MATCH, JPG_MATCH, JPEG_MATCH)) :
 
                         print ("path-filename : " + path)
 
                         # client provided path
-                        path = WEB_ROOT + path
-                        path = cwd + path
+                        path = cwd + WEB_ROOT + path
+                    else :
 
                         # split the path from the requested file
                         try :
@@ -423,37 +427,37 @@ while True :
 
         # prep results for delivery
         try :
-            status_line =   protocol + WHITE_SPACE + status + NEW_LINE
-            content_line =  CONTENT_FIELD        + COLON \
-                                                + WHITE_SPACE \
-                                                + mime_type \
-                                                + SEMI_COLON \
-                                                + WHITE_SPACE \
-                                                + CHARSET_FIELD \
-                                                + charset \
-                                                + NEW_LINE
-            date_line =     DATE_FIELD          + COLON \
-                                                + WHITE_SPACE \
-                                                + date_value \
-                                                + NEW_LINE
-            modified_line = LAST_MODIFIED_FIELD + COLON \
-                                                + WHITE_SPACE \
-                                                + modified_date \
-                                                + NEW_LINE
-            length_line =   LENGTH_FIELD        + COLON \
-                                                + WHITE_SPACE \
-                                                + length_str \
-                                                + NEW_LINE
-            connect_line =  CONNECTION_FIELD    + COLON \
-                                                + WHITE_SPACE \
-                                                + connection_value \
-                                                + NEW_LINE
-            reply_header =  status_line         + content_line \
-                                                + date_line \
-                                                + modified_line \
-                                                + length_line \
-                                                + connect_line \
-                                                + END_HEADER
+            status_line =   protocol + WHITE_SPACE  + status + NEW_LINE
+            content_line =  CONTENT_FIELD           + COLON \
+                                                    + WHITE_SPACE \
+                                                    + mime_type \
+                                                    + SEMI_COLON \
+                                                    + WHITE_SPACE \
+                                                    + CHARSET_FIELD \
+                                                    + charset \
+                                                    + NEW_LINE
+            date_line =     DATE_FIELD              + COLON \
+                                                    + WHITE_SPACE \
+                                                    + date_value \
+                                                    + NEW_LINE
+            modified_line = LAST_MODIFIED_FIELD     + COLON \
+                                                    + WHITE_SPACE \
+                                                    + modified_date \
+                                                    + NEW_LINE
+            length_line =   LENGTH_FIELD            + COLON \
+                                                    + WHITE_SPACE \
+                                                    + length_str \
+                                                    + NEW_LINE
+            connect_line =  CONNECTION_FIELD        + COLON \
+                                                    + WHITE_SPACE \
+                                                    + connection_value \
+                                                    + NEW_LINE
+            reply_header =  status_line             + content_line \
+                                                    + date_line \
+                                                    + modified_line \
+                                                    + length_line \
+                                                    + connect_line \
+                                                    + END_HEADER
         except TypeError :
             error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n"
             status = "500 Internal Server Error\r\n"

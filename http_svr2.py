@@ -199,3 +199,46 @@ while True :
 
 
 sys.exit()                      # Exit the Program
+
+
+
+                        # update the working directory
+                        try :
+                            os.chdir(path)
+                            print(os.getcwd())
+                        except FileNotFoundError :
+                            error_message = "ERROR Path Not Found"
+                            status = "404 Not Found"
+                            print (status + " : " + error_message)
+
+                        # get file size and convert to string
+                        try :
+                            file_size = os.path.getsize(file_name)
+                            file_size += HEADER_SIZE
+                            length_str = str(file_size)
+                        except OSError :
+                            error_message = "ERROR Obtaining File Size"
+                            status = "500 Internal Server Error"
+                            print (status + " : " + error_message)
+
+                        # get time last modified and convert to string
+                        try :
+                            modified_date = str(os.path.getmtime(file_name))
+                        except OSError :
+                            error_message = "ERROR Obtaining Modified Time"
+                            status = "500 Internal Server Error"
+                            print (status + " : " + error_message)
+
+                        # open the file and assign to a string
+                        try :
+                            with open(file_name, 'rb') as file:
+                                requested_file = file.read()
+                            status = "200 OK"
+                        except FileNotFoundError :
+                            error_message = "ERROR Reading Default File"
+                            status = "500 Internal Server Error"
+                            print (status + " : " + error_message)
+                        except UnicodeError :
+                            error_message = "ERROR Decoding Data"
+                            status = "500 Internal Server Error"
+                            print (status + " : " + error_message)
