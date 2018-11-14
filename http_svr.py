@@ -65,7 +65,6 @@ charset = "UTF-8"               # default encoding protocol
 client_method = "GET"           # acceptable client method
 mime_type = TEXT_TYPE           # default to text/html
 error_message = NEW_LINE        # default error message for response header
-exit_socket = 0                 # decision tree default status
 
 
 
@@ -162,22 +161,23 @@ print ("Listening for Client on Port Number : " + user_input)
 # establish client socket loop
 while True :
 
+    # reset client defaults
+    exit_socket = 0
+    error_message = ""
+    date_value = str(datetime.datetime.now())
+    requested_file = bytearray()
+
     # reset working directory each iteration
     try :
         os.chdir(server_home)
     except FileNotFoundError :
         error_message = "ERROR Path Not Found"
         status = "404 Not Found"
-        print (status + " : " + error_message)
         exit_socket = 1
 
     # initialize header fields
     connection_value = "close"
     status = ""
-
-    # initialize socket for new client
-    date_value = str(datetime.datetime.now())
-    requested_file = bytearray()
     cwd = os.getcwd()
 
     # connect to client
@@ -188,7 +188,6 @@ while True :
     except ConnectionError :
         error_message = "ERROR Unable to Connect with Client"
         status = "500 Internal Server Error"
-        print (status + " : " + error_message)
         exit_socket = 1
 
 
@@ -210,7 +209,6 @@ while True :
         except ConnectionError :
                 error_message = "ERROR Receiving Client Message"
                 status = "500 Internal Error"
-                print (status + " : " + error_message)
                 exit_socket = 2
 
 
@@ -227,7 +225,6 @@ while True :
             if x != -1 :
                 error_message = "ERROR Invalid Request Attempt"
                 status = "400 Bad Request"
-                print (status + " : " + error_message)
                 exit_socket = 3
 
             # when no mal script present
@@ -242,12 +239,10 @@ while True :
                     except IndexError :
                         error_message = "ERROR Unable to Strip Request Type"
                         status = "501 Not Implemented"
-                        print (status + " : " + error_message)
                         exit_socket = 3
                 else :
                     error_message = "ERROR Invalid Request Type"
                     status = "501 Not Implemented"
-                    print (status + " : " + error_message)
                     exit_socket = 3
 
 
@@ -272,12 +267,10 @@ while True :
                     except IndexError :
                         error_message = "ERROR Unable to Strip Protocol"
                         status = "400 Bad Request"
-                        print (status + " : " + error_message)
                         exit_socket = 4
                 else :
                     error_message = "ERROR Not a Valid HTTP Request"
                     status = "400 Bad Request"
-                    print (status + " : " + error_message)
                     exit_socket = 4
 
 
@@ -295,15 +288,12 @@ while True :
                         # finalize the working directory and default file
                         file_name = DEFAULT_FILE
 
-                        print ("path-filename if : " + path)
-
                         # change to requested directory
                         try :
                             os.chdir(path)
                         except FileNotFoundError :
                             error_message = "ERROR Path Not Found"
                             status = "404 Not Found"
-                            print (status + " : " + error_message)
                             exit_socket = 5
 
 
@@ -318,7 +308,6 @@ while True :
                         except IndexError :
                             error_message = "ERROR Spliting Filename from Path"
                             status = "400 Bad Request"
-                            print (status + " : " + error_message)
 
                         # strip the file name of any trailing whitespace
                         try :
@@ -327,9 +316,6 @@ while True :
                             error_message = \
                                 "ERROR Striping Whitespace from Filename"
                             status = "400 Bad Request"
-                            print (status + " : " + error_message)
-
-                        print ("path-filename elif : " + path)
 
                         # change to requested directory
                         try :
@@ -337,15 +323,12 @@ while True :
                         except FileNotFoundError :
                             error_message = "ERROR Path Not Found"
                             status = "404 Not Found"
-                            print (status + " : " + error_message)
                             exit_socket = 5
 
 
 
                     # or else the path does not contain a filename
                     else :
-
-                        print ("path-filename elif : " + path)
 
                         # use the default file
                         file_name = DEFAULT_FILE
@@ -356,7 +339,6 @@ while True :
                         except FileNotFoundError :
                             error_message = "ERROR Path Not Found"
                             status = "404 Not Found"
-                            print (status + " : " + error_message)
                             exit_socket = 5
 
 
@@ -371,7 +353,6 @@ while True :
                         except OSError :
                             error_message = "ERROR Unable to Determine FileType"
                             status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
                             exit_socket = 6
 
                         # set the mime type
@@ -387,11 +368,9 @@ while True :
                             else :
                                 error_message = "ERROR Assigning MIME Type"
                                 status = "500 Internal Server Error"
-                                print (status + " : " + error_message)
                         except OSError :
                             error_message = "ERROR Assigning MIME Type"
                             status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
                             exit_socket = 6
 
                         # get file size and convert to string
@@ -402,7 +381,6 @@ while True :
                         except OSError :
                             error_message = "ERROR Obtaining File Size"
                             status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
                             exit_socket = 6
 
                         # get time last modified
@@ -411,7 +389,6 @@ while True :
                         except OSError :
                             error_message = "ERROR Obtaining Modified Time"
                             status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
                             exit_socket = 6
 
 
@@ -428,96 +405,94 @@ while True :
                             except FileNotFoundError :
                                 error_message = "ERROR Reading Requested File"
                                 status = "500 Internal Server Error"
-                                print (status + " : " + error_message)
                                 exit_socket = 7
                             except UnicodeError :
                                 error_message = "ERROR Decoding Data"
                                 status = "500 Internal Server Error"
-                                print (status + " : " + error_message)
                                 exit_socket = 7
 
 
 
 
-        #  *********************   if no errors   ******************************** #
-        if error_message == NEW_LINE :
+    #  *********************   if no errors   ******************************** #
+    if error_message == NEW_LINE :
 
-            # prep results for delivery
-            try :
-                status_line =   protocol + WHITE_SPACE  + status + NEW_LINE
-                content_line =  CONTENT_FIELD           + COLON \
-                                                        + WHITE_SPACE \
-                                                        + mime_type \
-                                                        + SEMI_COLON \
-                                                        + WHITE_SPACE \
-                                                        + CHARSET_FIELD \
-                                                        + charset \
-                                                        + NEW_LINE
-                date_line =     DATE_FIELD              + COLON \
-                                                        + WHITE_SPACE \
-                                                        + date_value \
-                                                        + NEW_LINE
-                modified_line = LAST_MODIFIED_FIELD     + COLON \
-                                                        + WHITE_SPACE \
-                                                        + modified_date \
-                                                        + NEW_LINE
-                length_line =   LENGTH_FIELD            + COLON \
-                                                        + WHITE_SPACE \
-                                                        + length_str \
-                                                        + NEW_LINE
-                connect_line =  CONNECTION_FIELD        + COLON \
-                                                        + WHITE_SPACE \
-                                                        + connection_value \
-                                                        + NEW_LINE
-                reply_header =  status_line             + content_line \
-                                                        + date_line \
-                                                        + modified_line \
-                                                        + length_line \
-                                                        + connect_line \
-                                                        + END_HEADER
-            except TypeError :
-                error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n"
-                status = "500 Internal Server Error\r\n"
-                requested_file = status + error_message
-                print (status + " : " + error_message)
-
-
-
-
-            # encode header and append to requested file
-            try :
-                header_in_bytes = reply_header.encode(charset)
-                response = header_in_bytes + requested_file
-            except UnicodeError :
-                error_message = "ERROR Encode Reply Header\r\n\r\n".encode(charset)
-                status = "500 Internal Server Error\r\n".encode(charset)
-                requested_file = status + error_message
+        # prep results for delivery
+        try :
+            status_line =   protocol + WHITE_SPACE  + status + NEW_LINE
+            content_line =  CONTENT_FIELD           + COLON \
+                                                    + WHITE_SPACE \
+                                                    + mime_type \
+                                                    + SEMI_COLON \
+                                                    + WHITE_SPACE \
+                                                    + CHARSET_FIELD \
+                                                    + charset \
+                                                    + NEW_LINE
+            date_line =     DATE_FIELD              + COLON \
+                                                    + WHITE_SPACE \
+                                                    + date_value \
+                                                    + NEW_LINE
+            modified_line = LAST_MODIFIED_FIELD     + COLON \
+                                                    + WHITE_SPACE \
+                                                    + modified_date \
+                                                    + NEW_LINE
+            length_line =   LENGTH_FIELD            + COLON \
+                                                    + WHITE_SPACE \
+                                                    + length_str \
+                                                    + NEW_LINE
+            connect_line =  CONNECTION_FIELD        + COLON \
+                                                    + WHITE_SPACE \
+                                                    + connection_value \
+                                                    + NEW_LINE
+            reply_header =  status_line             + content_line \
+                                                    + date_line \
+                                                    + modified_line \
+                                                    + length_line \
+                                                    + connect_line \
+                                                    + END_HEADER
+        except TypeError :
+            error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n"
+            status = "500 Internal Server Error\r\n"
+            requested_file = status + error_message
+            print (status + " : " + error_message)
 
 
 
 
-            # return results to client
-            try :
-                clientSock.sendall(response)
-            except OSError :
-                print ("ERROR Sending Requested File")
-                sys.exit ("Exiting Program")
+        # encode header and append to requested file
+        try :
+            header_in_bytes = reply_header.encode(charset)
+            response = header_in_bytes + requested_file
+        except UnicodeError :
+            error_message = "ERROR Encode Reply Header\r\n\r\n".encode(charset)
+            status = "500 Internal Server Error\r\n".encode(charset)
+            requested_file = status + error_message
 
 
 
 
-        # return an error response
-        else:
-            status += END_HEADER
-            exit_code = str(exit_socket)
-            error_response = status
-            print (error_response + error_message + " : " + exit_code)
-            # return error to client
-            try :
-                clientSock.sendall(error_response.encode(charset))
-            except OSError :
-                print ("ERROR Sending Requested File")
-                sys.exit ("Exiting Program")
+        # return results to client
+        try :
+            clientSock.sendall(response)
+        except OSError :
+            print ("ERROR Sending Requested File")
+            sys.exit ("Exiting Program")
+
+
+
+
+    # return an error response
+    else:
+        status += END_HEADER
+        exit_code = str(exit_socket)
+        error_response = status
+        print (error_response + error_message + " : " + exit_code)
+        # return error to client
+        try :
+            clientSock.sendall(error_response.encode(charset))
+        except OSError :
+            print ("ERROR Sending Requested File")
+            sys.exit ("Exiting Program")
 
 
 
