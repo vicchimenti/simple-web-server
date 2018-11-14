@@ -439,85 +439,85 @@ while True :
 
 
 
-    #  *********************   if no errors   ******************************** #
-    if error_message == NEW_LINE :
+        #  *********************   if no errors   ******************************** #
+        if error_message == NEW_LINE :
 
-        # prep results for delivery
-        try :
-            status_line =   protocol + WHITE_SPACE  + status + NEW_LINE
-            content_line =  CONTENT_FIELD           + COLON \
-                                                    + WHITE_SPACE \
-                                                    + mime_type \
-                                                    + SEMI_COLON \
-                                                    + WHITE_SPACE \
-                                                    + CHARSET_FIELD \
-                                                    + charset \
-                                                    + NEW_LINE
-            date_line =     DATE_FIELD              + COLON \
-                                                    + WHITE_SPACE \
-                                                    + date_value \
-                                                    + NEW_LINE
-            modified_line = LAST_MODIFIED_FIELD     + COLON \
-                                                    + WHITE_SPACE \
-                                                    + modified_date \
-                                                    + NEW_LINE
-            length_line =   LENGTH_FIELD            + COLON \
-                                                    + WHITE_SPACE \
-                                                    + length_str \
-                                                    + NEW_LINE
-            connect_line =  CONNECTION_FIELD        + COLON \
-                                                    + WHITE_SPACE \
-                                                    + connection_value \
-                                                    + NEW_LINE
-            reply_header =  status_line             + content_line \
-                                                    + date_line \
-                                                    + modified_line \
-                                                    + length_line \
-                                                    + connect_line \
-                                                    + END_HEADER
-        except TypeError :
-            error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n"
-            status = "500 Internal Server Error\r\n"
-            requested_file = status + error_message
-            print (status + " : " + error_message)
-
-
-
-
-        # encode header and append to requested file
-        try :
-            header_in_bytes = reply_header.encode(charset)
-            response = header_in_bytes + requested_file
-        except UnicodeError :
-            error_message = "ERROR Encode Reply Header\r\n\r\n".encode(charset)
-            status = "500 Internal Server Error\r\n".encode(charset)
-            requested_file = status + error_message
+            # prep results for delivery
+            try :
+                status_line =   protocol + WHITE_SPACE  + status + NEW_LINE
+                content_line =  CONTENT_FIELD           + COLON \
+                                                        + WHITE_SPACE \
+                                                        + mime_type \
+                                                        + SEMI_COLON \
+                                                        + WHITE_SPACE \
+                                                        + CHARSET_FIELD \
+                                                        + charset \
+                                                        + NEW_LINE
+                date_line =     DATE_FIELD              + COLON \
+                                                        + WHITE_SPACE \
+                                                        + date_value \
+                                                        + NEW_LINE
+                modified_line = LAST_MODIFIED_FIELD     + COLON \
+                                                        + WHITE_SPACE \
+                                                        + modified_date \
+                                                        + NEW_LINE
+                length_line =   LENGTH_FIELD            + COLON \
+                                                        + WHITE_SPACE \
+                                                        + length_str \
+                                                        + NEW_LINE
+                connect_line =  CONNECTION_FIELD        + COLON \
+                                                        + WHITE_SPACE \
+                                                        + connection_value \
+                                                        + NEW_LINE
+                reply_header =  status_line             + content_line \
+                                                        + date_line \
+                                                        + modified_line \
+                                                        + length_line \
+                                                        + connect_line \
+                                                        + END_HEADER
+            except TypeError :
+                error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n"
+                status = "500 Internal Server Error\r\n"
+                requested_file = status + error_message
+                print (status + " : " + error_message)
 
 
 
 
-        # return results to client
-        try :
-            clientSock.sendall(response)
-        except OSError :
-            print ("ERROR Sending Requested File")
-            sys.exit ("Exiting Program")
+            # encode header and append to requested file
+            try :
+                header_in_bytes = reply_header.encode(charset)
+                response = header_in_bytes + requested_file
+            except UnicodeError :
+                error_message = "ERROR Encode Reply Header\r\n\r\n".encode(charset)
+                status = "500 Internal Server Error\r\n".encode(charset)
+                requested_file = status + error_message
 
 
 
 
-    # return an error response
-    else:
-        status += END_HEADER
-        exit_code = str(exit_socket)
-        error_response = status
-        print (error_response + error_message + exit_code)
-        # return error to client
-        try :
-            clientSock.sendall(error_response.encode(charset))
-        except OSError :
-            print ("ERROR Sending Requested File")
-            sys.exit ("Exiting Program")
+            # return results to client
+            try :
+                clientSock.sendall(response)
+            except OSError :
+                print ("ERROR Sending Requested File")
+                sys.exit ("Exiting Program")
+
+
+
+
+        # return an error response
+        else:
+            status += END_HEADER
+            exit_code = str(exit_socket)
+            error_response = status
+            print (error_response + error_message + " : " + exit_code)
+            # return error to client
+            try :
+                clientSock.sendall(error_response.encode(charset))
+            except OSError :
+                print ("ERROR Sending Requested File")
+                sys.exit ("Exiting Program")
 
 
 
