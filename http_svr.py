@@ -386,8 +386,12 @@ while True :
 
                         # get time last modified
                         try :
-                            md = str(os.path.getmtime(file_name))
-                            modified_date = datetime.datetime.fromtimestamp(md)
+                            md_stamp = os.path.getmtime(file_name)
+                            md_obj = datetime.datetime.fromtimestamp(md_stamp)
+                            modified_date = repr(md_obj)
+                            #md = str(os.path.getmtime(file_name))
+                            #t = int(md)
+                            #modified_date = datetime.datetime.fromtimestamp(t)
                         except OSError :
                             error_message = "ERROR Obtaining Modified Time"
                             status = "500 Internal Server Error"
