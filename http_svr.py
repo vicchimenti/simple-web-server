@@ -274,69 +274,22 @@ while True :
                     # initialize the file string
                     requested_file = ""
                     path = cwd + WEB_ROOT + path
-                    # requested path is empty
-                    if path == SINGLE_SLASH :
-                        # empty path provided so file name initializes to index.html
-                        file_name = DEFAULT_FILE
+
+                    # change to requested directory
+                    try :
+                        os.chdir(path)
+                    except FileNotFoundError :
+                        error_message = "ERROR Path Not Found"
+                        status = "404 Not Found"
+                        print (status + " : " + error_message)
+
+
                     # requested path contains a directory then check for file extension
-                    elif path.lower().endswith((TEXT_MATCH, PNG_MATCH, JPG_MATCH, JPEG_MATCH)) :
+                    if path.lower().endswith((TEXT_MATCH, PNG_MATCH, JPG_MATCH, JPEG_MATCH)) :
 
                         print ("path-filename : " + path)
 
-                        # client provided path
-                        path = cwd + WEB_ROOT + path
-
-                        # update the working directory
-                        try :
-                            os.chdir(path)
-                            print(os.getcwd())
-                        except FileNotFoundError :
-                            error_message = "ERROR Path Not Found"
-                            status = "404 Not Found"
-                            print (status + " : " + error_message)
-
-                        # get file size and convert to string
-                        try :
-                            file_size = os.path.getsize(file_name)
-                            file_size += HEADER_SIZE
-                            length_str = str(file_size)
-                        except OSError :
-                            error_message = "ERROR Obtaining File Size"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
-
-                        # get time last modified and convert to string
-                        try :
-                            modified_date = str(os.path.getmtime(file_name))
-                        except OSError :
-                            error_message = "ERROR Obtaining Modified Time"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
-
-                        # open the file and assign to a string
-                        try :
-                            with open(file_name, 'rb') as file:
-                                requested_file = file.read()
-                            status = "200 OK"
-                        except FileNotFoundError :
-                            error_message = "ERROR Reading Default File"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
-                        except UnicodeError :
-                            error_message = "ERROR Decoding Data"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
-
-                    # requested path contains a directory then check for file extension
-                    elif path.lower().endswith((TEXT_MATCH, PNG_MATCH, JPG_MATCH, JPEG_MATCH)) :
-
-                        print ("path-filename : " + path)
-
-                        # client provided path
-                        path = cwd + WEB_ROOT + path
-                    else :
-
-                        # split the path from the requested file
+                        # the path ends in a file extension so extract the path from the file
                         try :
                             path, file_name = path.rsplit(SINGLE_SLASH, 1)
                         except IndexError :
@@ -353,76 +306,74 @@ while True :
                             status = "400 Bad Request"
                             print (status + " : " + error_message)
 
-                        # change to requested directory
-                        try :
-                            os.chdir(path)
-                        except FileNotFoundError :
-                            error_message = "ERROR Path Not Found"
-                            status = "404 Not Found"
-                            print (status + " : " + error_message)
+                    # or else use the default file name
+                    else :
+                        file_name = DEFAULT_FILE
 
-                        # extract the file type from the filename
-                        try :
-                            file_name_only, file_type = os.path.splitext(file_name)
-                        except OSError :
-                            error_message = "ERROR Unable to Determine FileType"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
 
-                        # set the mime type
-                        try :
-                            if file_type == TEXT_MATCH :
-                                mime_type = TEXT_TYPE
-                            elif file_type == PNG_MATCH :
-                                mime_type = PNG_TYPE
-                            elif file_type == JPG_MATCH :
-                                mime_type = JPG_TYPE
-                            elif file_type == JPEG_MATCH :
-                                mime_type = JPEG_TYPE
-                            else :
-                                error_message = "ERROR Assigning MIME Type"
-                                status = "500 Internal Server Error"
-                                print (status + " : " + error_message)
-                        except OSError :
+                    # extract the file type from the filename
+                    try :
+                        file_name_only, file_type = os.path.splitext(file_name)
+                    except OSError :
+                        error_message = "ERROR Unable to Determine FileType"
+                        status = "500 Internal Server Error"
+                        print (status + " : " + error_message)
+
+                    # set the mime type
+                    try :
+                        if file_type == TEXT_MATCH :
+                            mime_type = TEXT_TYPE
+                        elif file_type == PNG_MATCH :
+                            mime_type = PNG_TYPE
+                        elif file_type == JPG_MATCH :
+                            mime_type = JPG_TYPE
+                        elif file_type == JPEG_MATCH :
+                            mime_type = JPEG_TYPE
+                        else :
                             error_message = "ERROR Assigning MIME Type"
                             status = "500 Internal Server Error"
                             print (status + " : " + error_message)
+                    except OSError :
+                        error_message = "ERROR Assigning MIME Type"
+                        status = "500 Internal Server Error"
+                        print (status + " : " + error_message)
 
-                        # get file size and convert to string
-                        try :
-                            file_size = os.path.getsize(file_name)
-                            file_size += HEADER_SIZE
-                            length_str = str(file_size)
-                        except OSError :
-                            error_message = "ERROR Obtaining File Size"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
+                    # get file size and convert to string
+                    try :
+                        file_size = os.path.getsize(file_name)
+                        file_size += HEADER_SIZE
+                        length_str = str(file_size)
+                    except OSError :
+                        error_message = "ERROR Obtaining File Size"
+                        status = "500 Internal Server Error"
+                        print (status + " : " + error_message)
 
-                        # get time last modified
-                        try :
-                            modified_date = str(os.path.getmtime(file_name))
-                        except OSError :
-                            error_message = "ERROR Obtaining Modified Time"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
+                    # get time last modified
+                    try :
+                        modified_date = str(os.path.getmtime(file_name))
+                    except OSError :
+                        error_message = "ERROR Obtaining Modified Time"
+                        status = "500 Internal Server Error"
+                        print (status + " : " + error_message)
 
-                        # open the file and assign to a string
-                        try :
-                            with open(file_name, 'rb') as file:
-                                requested_file = file.read()
-                            status = "200 OK"
-                        except FileNotFoundError :
-                            error_message = "ERROR Reading Requested File"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
-                        except UnicodeError :
-                            error_message = "ERROR Decoding Data"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
+                    # open the file and assign to a string
+                    try :
+                        with open(file_name, 'rb') as file:
+                            requested_file = file.read()
+                        status = "200 OK"
+                    except FileNotFoundError :
+                        error_message = "ERROR Reading Requested File"
+                        status = "500 Internal Server Error"
+                        print (status + " : " + error_message)
+                    except UnicodeError :
+                        error_message = "ERROR Decoding Data"
+                        status = "500 Internal Server Error"
+                        print (status + " : " + error_message)
 
 
 
-    # if no errors
+
+    #  *********************   if no errors   ******************************** #
     if error_message == NEW_LINE :
 
         # prep results for delivery
