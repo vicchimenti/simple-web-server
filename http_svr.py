@@ -3,7 +3,7 @@
 # http_svr.py
 # A Simple Web Server in Python3
 # Created           10/30/2018
-# Last Modified     11/11/2018
+# Last Modified     11/13/2018
 # /usr/local/python3/bin/python3
 
 
@@ -64,9 +64,7 @@ maximum_queue = 1               # Serve Only One Client at a Time
 charset = "UTF-8"               # default encoding protocol
 client_method = "GET"           # acceptable client method
 mime_type = TEXT_TYPE           # default to text/html
-file_name = DEFAULT_FILE        # file name initializes to index.html
 error_message = NEW_LINE        # default error message for response header
-exit_socket = 0                 # decision tree default status
 
 
 
@@ -163,14 +161,27 @@ print ("Listening for Client on Port Number : " + user_input)
 # establish client socket loop
 while True :
 
-    # reset working directory each iteration
+    # reset client defaults
     cwd = server_home
-    connection_value = "close"
+    exit_socket = 0
+    error_message = NEW_LINE
     date_value = str(datetime.datetime.now())
+    requested_file = ""
 
-    # initialize header status field
+    # reset working directory each iteration
+    try :
+        os.chdir(cwd)
+    except FileNotFoundError :
+        error_message = "ERROR Path Not Found"
+        status = "404 Not Found"
+        exit_socket = 1
+
+    # initialize header fields
+    connection_value = "close"
     status = ""
 
+
+    # connect to client
     try :
         (clientSock, address) = sock.accept()
         addr_str = str (address)
@@ -178,11 +189,13 @@ while True :
     except ConnectionError :
         error_message = "ERROR Unable to Connect with Client"
         status = "500 Internal Server Error"
-        print (status + " : " + error_message)
-        EXIT_SOCKET = 1
+        exit_socket = 1
+
+
+
 
     # proceed when exit socket is not active
-    if EXIT_SOCKET == 0 :
+    if exit_socket == 0 :
 
         # initialize message receive string
         client_message = ""
@@ -197,38 +210,47 @@ while True :
         except ConnectionError :
                 error_message = "ERROR Receiving Client Message"
                 status = "500 Internal Error"
-                print (status + " : " + error_message)
-                EXIT_SOCKET = 2
+                exit_socket = 2
 
 
 
-        # proceed when exit socket is not active
-        if EXIT_SOCKET == 0 :
+
+        # begin parsing request when exit socket is not active
+        if exit_socket == 0 :
 
             # Display the Client Request
             print ("Client Request :\n" + client_message)
 
-            # parse and process client request
-            x = client_message.find (client_method)
-            # if request is approved method then begin processing
+            # scan for malware
+            x = client_message.find (MAL_SET)
             if x != -1 :
-                try :
-                    get_request, path_protocol = \
-                        client_message.split(client_method, 2)
-                except IndexError :
-                    error_message = "ERROR Unable to Strip Request Type"
-                    status = "501 Not Implemented"
-                    print (status + " : " + error_message)
-                    EXIT_SOCKET = 3
+                error_message = "ERROR Invalid Request Attempt"
+                status = "400 Bad Request"
+                exit_socket = 3
+
+            # when no mal script present
             else :
-                error_message = "ERROR Invalid Request Type"
-                status = "501 Not Implemented"
-                print (status + " : " + error_message)
-                EXIT_SOCKET = 3
+                # parse and process client request
+                x = client_message.find (client_method)
+                # if request is approved method then begin processing
+                if x != -1 :
+                    try :
+                        get_request, path_protocol = \
+                            client_message.split(client_method, 2)
+                    except IndexError :
+                        error_message = "ERROR Unable to Strip Request Type"
+                        status = "501 Not Implemented"
+                        exit_socket = 3
+                else :
+                    error_message = "ERROR Invalid Request Type"
+                    status = "501 Not Implemented"
+                    exit_socket = 3
 
 
-            # proceed when exit socket is not active
-            if EXIT_SOCKET == 0 :
+
+
+            # parse the pathway from the request protocol
+            if exit_socket == 0 :
 
                 #if protocol is HTTP parse path from message
                 x = path_protocol.find (CLIENT_PROTOCOL)
@@ -236,96 +258,36 @@ while True :
                 if x != -1 :
                     try :
                         path = path_protocol[:x]
+                        # local protocal var for future portability incase other
+                        # protocols become acceptable. For now protocal is
+                        # asigned by default contstant instead of slicing
+                        # protocol = path_protocol[x:]
                         protocol = CLIENT_PROTOCOL
                         path = path.strip()
                         protocol = protocol.strip()
                     except IndexError :
                         error_message = "ERROR Unable to Strip Protocol"
                         status = "400 Bad Request"
-                        print (status + " : " + error_message)
-                        EXIT_SOCKET = 4
+                        exit_socket = 4
                 else :
                     error_message = "ERROR Not a Valid HTTP Request"
                     status = "400 Bad Request"
-                    print (status + " : " + error_message)
-                    EXIT_SOCKET = 4
+                    exit_socket = 4
 
 
-
+                # initialize the file string
+                file_name = ""
                 # proceed when exit socket is not active
-                if EXIT_SOCKET == 0 :
+                if exit_socket == 0 :
 
-                    # initialize the file string
-                    requested_file = ""
+                    # finalize the working directory
+                    path = cwd + WEB_ROOT + path
 
-                    # requested path is empty
+                    # in the case of an empty path
                     if path == SINGLE_SLASH :
-                        # empty path provided
-                        path = cwd + WEB_ROOT
 
-                        # update the working directory
-                        try :
-                            os.chdir(path)
-                            print(os.getcwd())
-                        except FileNotFoundError :
-                            error_message = "ERROR Path Not Found"
-                            status = "404 Not Found"
-                            print (status + " : " + error_message)
-
-                        # get file size and convert to string
-                        try :
-                            file_size = os.path.getsize(file_name)
-                            file_size += HEADER_SIZE
-                            length_str = str(file_size)
-                        except OSError :
-                            error_message = "ERROR Obtaining File Size"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
-
-                        # get time last modified and convert to string
-                        try :
-                            modified_date = str(os.path.getmtime(file_name))
-                        except OSError :
-                            error_message = "ERROR Obtaining Modified Time"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
-
-                        # open the file and assign to a string
-                        try :
-                            with open(file_name, 'rb') as file:
-                                requested_file = file.read()
-                            status = "200 OK"
-                        except FileNotFoundError :
-                            error_message = "ERROR Reading Default File"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
-                        except UnicodeError :
-                            error_message = "ERROR Decoding Data"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
-
-                    # requested path contains a directory
-                    else :
-                        # client provided path
-                        path = WEB_ROOT + path
-                        path = cwd + path
-
-                        # split the path from the requested file
-                        try :
-                            path, file_name = path.rsplit(SINGLE_SLASH, 1)
-                        except IndexError :
-                            error_message = "ERROR Spliting Filename from Path"
-                            status = "400 Bad Request"
-                            print (status + " : " + error_message)
-
-                        # strip the file name of any trailing whitespace
-                        try:
-                            file_name = file_name.rstrip()
-                        except IndexError :
-                            error_message = \
-                                "ERROR Striping Whitespace from Filename"
-                            status = "400 Bad Request"
-                            print (status + " : " + error_message)
+                        # finalize the working directory and default file
+                        file_name = DEFAULT_FILE
 
                         # change to requested directory
                         try :
@@ -333,7 +295,58 @@ while True :
                         except FileNotFoundError :
                             error_message = "ERROR Path Not Found"
                             status = "404 Not Found"
-                            print (status + " : " + error_message)
+                            exit_socket = 5
+
+
+
+                    # requested path contains a directory then check for file extension
+                    elif path.lower().endswith((TEXT_MATCH, PNG_MATCH, JPG_MATCH, JPEG_MATCH)) :
+
+
+                        # the path ends in a file extension so extract the path from the file
+                        try :
+                            path, file_name = path.rsplit(SINGLE_SLASH, 1)
+                        except IndexError :
+                            error_message = "ERROR Spliting Filename from Path"
+                            status = "400 Bad Request"
+
+                        # strip the file name of any trailing whitespace
+                        try :
+                            file_name = file_name.rstrip()
+                        except IndexError :
+                            error_message = \
+                                "ERROR Striping Whitespace from Filename"
+                            status = "400 Bad Request"
+
+                        # change to requested directory
+                        try :
+                            os.chdir(path)
+                        except FileNotFoundError :
+                            error_message = "ERROR Path Not Found"
+                            status = "404 Not Found"
+                            exit_socket = 5
+
+
+
+                    # or else the path does not contain a filename
+                    else :
+
+                        # use the default file
+                        file_name = DEFAULT_FILE
+
+                        # change to requested directory
+                        try :
+                            os.chdir(path)
+                        except FileNotFoundError :
+                            error_message = "ERROR Path Not Found"
+                            status = "404 Not Found"
+                            exit_socket = 5
+
+
+
+
+                    # gather file information and store for header
+                    if exit_socket == 0 :
 
                         # extract the file type from the filename
                         try :
@@ -341,7 +354,7 @@ while True :
                         except OSError :
                             error_message = "ERROR Unable to Determine FileType"
                             status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
+                            exit_socket = 6
 
                         # set the mime type
                         try :
@@ -356,11 +369,10 @@ while True :
                             else :
                                 error_message = "ERROR Assigning MIME Type"
                                 status = "500 Internal Server Error"
-                                print (status + " : " + error_message)
                         except OSError :
                             error_message = "ERROR Assigning MIME Type"
                             status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
+                            exit_socket = 6
 
                         # get file size and convert to string
                         try :
@@ -370,7 +382,7 @@ while True :
                         except OSError :
                             error_message = "ERROR Obtaining File Size"
                             status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
+                            exit_socket = 6
 
                         # get time last modified
                         try :
@@ -378,60 +390,67 @@ while True :
                         except OSError :
                             error_message = "ERROR Obtaining Modified Time"
                             status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
-
-                        # open the file and assign to a string
-                        try :
-                            with open(file_name, 'rb') as file:
-                                requested_file = file.read()
-                            status = "200 OK"
-                        except FileNotFoundError :
-                            error_message = "ERROR Reading Requested File"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
-                        except UnicodeError :
-                            error_message = "ERROR Decoding Data"
-                            status = "500 Internal Server Error"
-                            print (status + " : " + error_message)
+                            exit_socket = 6
 
 
 
-    # if no errors
+
+                        # open file and stream data
+                        if exit_socket == 0 :
+
+                            # open the file and assign to a string
+                            try :
+                                with open(file_name, 'rb') as file:
+                                    requested_file = file.read()
+                                status = "200 OK"
+                            except FileNotFoundError :
+                                error_message = "ERROR Reading Requested File"
+                                status = "500 Internal Server Error"
+                                exit_socket = 7
+                            except UnicodeError :
+                                error_message = "ERROR Decoding Data"
+                                status = "500 Internal Server Error"
+                                exit_socket = 7
+
+
+
+
+    #  *********************   if no errors   ******************************** #
     if error_message == NEW_LINE :
 
         # prep results for delivery
         try :
-            status_line =   protocol + WHITE_SPACE + status + NEW_LINE
-            content_line =  CONTENT_FIELD        + COLON \
-                                                + WHITE_SPACE \
-                                                + mime_type \
-                                                + SEMI_COLON \
-                                                + WHITE_SPACE \
-                                                + CHARSET_FIELD \
-                                                + charset \
-                                                + NEW_LINE
-            date_line =     DATE_FIELD          + COLON \
-                                                + WHITE_SPACE \
-                                                + date_value \
-                                                + NEW_LINE
-            modified_line = LAST_MODIFIED_FIELD + COLON \
-                                                + WHITE_SPACE \
-                                                + modified_date \
-                                                + NEW_LINE
-            length_line =   LENGTH_FIELD        + COLON \
-                                                + WHITE_SPACE \
-                                                + length_str \
-                                                + NEW_LINE
-            connect_line =  CONNECTION_FIELD    + COLON \
-                                                + WHITE_SPACE \
-                                                + connection_value \
-                                                + NEW_LINE
-            reply_header =  status_line         + content_line \
-                                                + date_line \
-                                                + modified_line \
-                                                + length_line \
-                                                + connect_line \
-                                                + END_HEADER
+            status_line =   protocol + WHITE_SPACE  + status + NEW_LINE
+            content_line =  CONTENT_FIELD           + COLON \
+                                                    + WHITE_SPACE \
+                                                    + mime_type \
+                                                    + SEMI_COLON \
+                                                    + WHITE_SPACE \
+                                                    + CHARSET_FIELD \
+                                                    + charset \
+                                                    + NEW_LINE
+            date_line =     DATE_FIELD              + COLON \
+                                                    + WHITE_SPACE \
+                                                    + date_value \
+                                                    + NEW_LINE
+            modified_line = LAST_MODIFIED_FIELD     + COLON \
+                                                    + WHITE_SPACE \
+                                                    + modified_date \
+                                                    + NEW_LINE
+            length_line =   LENGTH_FIELD            + COLON \
+                                                    + WHITE_SPACE \
+                                                    + length_str \
+                                                    + NEW_LINE
+            connect_line =  CONNECTION_FIELD        + COLON \
+                                                    + WHITE_SPACE \
+                                                    + connection_value \
+                                                    + NEW_LINE
+            reply_header =  status_line             + content_line \
+                                                    + date_line \
+                                                    + modified_line \
+                                                    + length_line \
+                                                    + connect_line \
+                                                    + END_HEADER
         except TypeError :
             error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n"
             status = "500 Internal Server Error\r\n"
@@ -454,6 +473,7 @@ while True :
 
 
         # return results to client
+        print (status)
         try :
             clientSock.sendall(response)
         except OSError :
@@ -465,9 +485,10 @@ while True :
 
     # return an error response
     else:
-        status += NEW_LINE
-        error_message += END_HEADER
-        error_response = status + error_message
+        status += END_HEADER
+        exit_code = str(exit_socket)
+        error_response = status
+        print (error_response + error_message + " : " + exit_code)
         # return error to client
         try :
             clientSock.sendall(error_response.encode(charset))
@@ -486,7 +507,7 @@ while True :
 # TODO :    look at last modified time
 #           review error checking
 #           review assignment requirements
-#           move to cs2 and test with commercial browser
+
 
 
 
