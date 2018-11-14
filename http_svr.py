@@ -505,10 +505,9 @@ while True :
     print ("Listening for Next Client on Port Number : " + user_input)
 
 # TODO :    look at last modified time
-#           revisit png and jpg file types
 #           review error checking
 #           review assignment requirements
-#           move to cs2 and test with commercial browser
+
 
 
 
