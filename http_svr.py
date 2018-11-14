@@ -507,9 +507,12 @@ while True :
 # TODO :    look at last modified time
 #           review error checking
 #           review assignment requirements
+#           add body size field
 
 
 
 
-
-sys.exit()                      # Exit the Program
+# Close the Listening Socket
+sock.close()
+# Exit the Program
+sys.exit()
