@@ -388,7 +388,9 @@ while True :
                         try :
                             md_stamp = os.path.getmtime(file_name)
                             md_obj = datetime.datetime.fromtimestamp(md_stamp)
-                            modified_date = repr(md_obj)
+                            md_time_tuple = repr(md_obj)
+                            modified_date_obj = datetime(md_time_tuple)
+                            modified_date = modified_date_obj.strftime("%Y-%m-%d %H:%M:%S")
                             #TODO: fix
                             #   Last-Modified:
                             #       datetime.datetime(2018, 11, 10, 19, 51, 57)
