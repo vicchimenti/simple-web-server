@@ -271,18 +271,12 @@ while True :
                 # proceed when exit socket is not active
                 if exit_socket == 0 :
 
-                    # initialize the file string
+                    # initialize the file strings
                     requested_file = ""
+                    file_name = requested_file
+
+                    # finalize the working directory
                     path = cwd + WEB_ROOT + path
-
-                    # change to requested directory
-                    try :
-                        os.chdir(path)
-                    except FileNotFoundError :
-                        error_message = "ERROR Path Not Found"
-                        status = "404 Not Found"
-                        print (status + " : " + error_message)
-
 
                     # requested path contains a directory then check for file extension
                     if path.lower().endswith((TEXT_MATCH, PNG_MATCH, JPG_MATCH, JPEG_MATCH)) :
@@ -306,11 +300,20 @@ while True :
                             status = "400 Bad Request"
                             print (status + " : " + error_message)
 
+
                     # or else use the default file name
                     else :
                         file_name = DEFAULT_FILE
 
 
+                    # change to requested directory
+                    try :
+                        os.chdir(path)
+                    except FileNotFoundError :
+                        error_message = "ERROR Path Not Found"
+                        status = "404 Not Found"
+                        print (status + " : " + error_message)
+                                                
                     # extract the file type from the filename
                     try :
                         file_name_only, file_type = os.path.splitext(file_name)
