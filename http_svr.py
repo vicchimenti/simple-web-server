@@ -473,6 +473,7 @@ while True :
 
 
         # return results to client
+        print (status)
         try :
             clientSock.sendall(response)
         except OSError :
