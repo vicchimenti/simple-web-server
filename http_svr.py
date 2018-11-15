@@ -184,6 +184,8 @@ while True :
     status = ""
 
 
+
+
     # connect to client
     try :
         (clientSock, address) = sock.accept()
@@ -203,7 +205,10 @@ while True :
         # initialize message receive string
         client_message = ""
 
-        # receive request
+
+
+
+        # receive request until delimiter found
         try :
             while True :
                 message = clientSock.recv (65536)
@@ -261,10 +266,7 @@ while True :
                 if x != -1 :
                     try :
                         path_raw = path_protocol[:x]
-                        # local protocal var for future portability incase other
-                        # protocols become acceptable. For now protocal is
-                        # asigned by default contstant instead of slicing
-                        # protocol = path_protocol[x:]
+                        # assign local via constant until more protocols approved
                         protocol = CLIENT_PROTOCOL
                         path_raw = path_raw.strip()
                         protocol = protocol.strip()
