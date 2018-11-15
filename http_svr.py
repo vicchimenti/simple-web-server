@@ -3,7 +3,7 @@
 # http_svr.py
 # A Simple Web Server in Python3
 # Created           10/30/2018
-# Last Modified     11/14/2018
+# Last Modified     11/15/2018
 # /usr/local/python3/bin/python3
 
 
@@ -211,7 +211,7 @@ while True :
         # receive request until delimiter found
         try :
             while True :
-                message = clientSock.recv (65536)
+                message = clientSock.recv (4096)
                 client_message += message.decode (charset)
                 x = client_message.find(END_HEADER)
                 if x != -1 : break
