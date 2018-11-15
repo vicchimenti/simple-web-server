@@ -139,10 +139,6 @@ except ConnectionError :
     print (error_message)
     sys.exit ("Exiting Program")
 except OSError :
-    error_message = "ERROR OSError Binding the Host and Port"
-    print (error_message)
-    sys.exit ("Exiting Program")
-except Exception :
     error_message = "ERROR Port Already in Use"
     print (error_message)
     sys.exit ("Exiting Program")
