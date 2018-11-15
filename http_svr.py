@@ -135,7 +135,11 @@ except ConnectionError :
 try :
     sock.bind ((host, port))
 except ConnectionError :
-    error_message = "ERROR Binding the Host and Port"
+    error_message = "ERROR ConnectionError Binding the Host and Port"
+    print (error_message)
+    sys.exit ("Exiting Program")
+except OSError :
+    error_message = "ERROR OSError Binding the Host and Port"
     print (error_message)
     sys.exit ("Exiting Program")
 
