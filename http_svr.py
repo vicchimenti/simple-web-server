@@ -173,7 +173,7 @@ while True :
     except FileNotFoundError :
         error_message = "ERROR Path Not Found"
         status = "404 Not Found"
-        exit_socket = 1
+        exit_socket = 10
 
     # initialize header fields
     connection_value = "close"
@@ -188,7 +188,7 @@ while True :
     except ConnectionError :
         error_message = "ERROR Unable to Connect with Client"
         status = "500 Internal Server Error"
-        exit_socket = 1
+        exit_socket = 11
 
 
 
@@ -209,7 +209,7 @@ while True :
         except ConnectionError :
                 error_message = "ERROR Receiving Client Message"
                 status = "500 Internal Error"
-                exit_socket = 2
+                exit_socket = 20
 
 
 
@@ -225,7 +225,7 @@ while True :
             if x != -1 :
                 error_message = "ERROR Invalid Request Attempt"
                 status = "400 Bad Request"
-                exit_socket = 3
+                exit_socket = 30
 
             # when no mal script present
             else :
@@ -239,11 +239,11 @@ while True :
                     except IndexError :
                         error_message = "ERROR Unable to Strip Request Type"
                         status = "501 Not Implemented"
-                        exit_socket = 3
+                        exit_socket = 31
                 else :
                     error_message = "ERROR Invalid Request Type"
                     status = "501 Not Implemented"
-                    exit_socket = 3
+                    exit_socket = 32
 
 
 
@@ -256,22 +256,22 @@ while True :
                 # if request is in HTTP format
                 if x != -1 :
                     try :
-                        path = path_protocol[:x]
+                        path_raw = path_protocol[:x]
                         # local protocal var for future portability incase other
                         # protocols become acceptable. For now protocal is
                         # asigned by default contstant instead of slicing
                         # protocol = path_protocol[x:]
                         protocol = CLIENT_PROTOCOL
-                        path = path.strip()
+                        path_raw = path_raw.strip()
                         protocol = protocol.strip()
                     except IndexError :
                         error_message = "ERROR Unable to Strip Protocol"
                         status = "400 Bad Request"
-                        exit_socket = 4
+                        exit_socket = 40
                 else :
                     error_message = "ERROR Not a Valid HTTP Request"
                     status = "400 Bad Request"
-                    exit_socket = 4
+                    exit_socket = 41
 
 
                 # initialize the file string
@@ -280,10 +280,10 @@ while True :
                 if exit_socket == 0 :
 
                     # finalize the working directory
-                    path = cwd + WEB_ROOT + path
+                    path = cwd + WEB_ROOT + path_raw
 
                     # in the case of an empty path
-                    if path == SINGLE_SLASH :
+                    if path_raw == SINGLE_SLASH :
 
                         # finalize the working directory and default file
                         file_name = DEFAULT_FILE
@@ -292,15 +292,14 @@ while True :
                         try :
                             os.chdir(path)
                         except FileNotFoundError :
-                            error_message = "ERROR Path Not Found"
+                            error_message = "ERROR Valid Path Not Found"
                             status = "404 Not Found"
-                            exit_socket = 5
+                            exit_socket = 50
 
 
 
                     # requested path contains a directory then check for file extension
-                    elif path.lower().endswith((TEXT_MATCH, PNG_MATCH, JPG_MATCH, JPEG_MATCH)) :
-
+                    elif os.path.isfile(path) :
 
                         # the path ends in a file extension so extract the path from the file
                         try :
@@ -308,6 +307,7 @@ while True :
                         except IndexError :
                             error_message = "ERROR Spliting Filename from Path"
                             status = "400 Bad Request"
+                            exit_socket = 51
 
                         # strip the file name of any trailing whitespace
                         try :
@@ -316,19 +316,20 @@ while True :
                             error_message = \
                                 "ERROR Striping Whitespace from Filename"
                             status = "400 Bad Request"
+                            exit_socket = 52
 
                         # change to requested directory
                         try :
                             os.chdir(path)
                         except FileNotFoundError :
-                            error_message = "ERROR Path Not Found"
+                            error_message = "ERROR File Not Found"
                             status = "404 Not Found"
-                            exit_socket = 5
+                            exit_socket = 53
 
 
 
                     # or else the path does not contain a filename
-                    else :
+                    elif os.path.isdir(path) :
 
                         # use the default file
                         file_name = DEFAULT_FILE
@@ -339,7 +340,13 @@ while True :
                         except FileNotFoundError :
                             error_message = "ERROR Path Not Found"
                             status = "404 Not Found"
-                            exit_socket = 5
+                            exit_socket = 54
+
+                    # or else no valid path is given
+                    else :
+                        error_message = "ERROR Invalid Path Requested"
+                        status = "404 Not Found"
+                        exit_socket = 55
 
 
 
@@ -353,7 +360,7 @@ while True :
                         except OSError :
                             error_message = "ERROR Unable to Determine FileType"
                             status = "500 Internal Server Error"
-                            exit_socket = 6
+                            exit_socket = 60
 
                         # set the mime type
                         try :
@@ -371,7 +378,7 @@ while True :
                         except OSError :
                             error_message = "ERROR Assigning MIME Type"
                             status = "500 Internal Server Error"
-                            exit_socket = 6
+                            exit_socket = 61
 
                         # get file size and convert to string
                         try :
@@ -380,7 +387,7 @@ while True :
                         except OSError :
                             error_message = "ERROR Obtaining File Size"
                             status = "500 Internal Server Error"
-                            exit_socket = 6
+                            exit_socket = 62
 
                         # get time last modified
                         try :
@@ -390,7 +397,7 @@ while True :
                         except OSError :
                             error_message = "ERROR Obtaining Modified Time"
                             status = "500 Internal Server Error"
-                            exit_socket = 6
+                            exit_socket = 63
 
 
 
@@ -406,11 +413,11 @@ while True :
                             except FileNotFoundError :
                                 error_message = "ERROR Reading Requested File"
                                 status = "500 Internal Server Error"
-                                exit_socket = 7
+                                exit_socket = 70
                             except UnicodeError :
                                 error_message = "ERROR Decoding Data"
                                 status = "500 Internal Server Error"
-                                exit_socket = 7
+                                exit_socket = 71
 
 
 
@@ -452,22 +459,23 @@ while True :
                                                     + connect_line \
                                                     + END_HEADER
         except TypeError :
-            error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n"
-            status = "500 Internal Server Error\r\n"
-            requested_file = status + error_message
-            print (status + " : " + error_message)
+            error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n".encode(charset)
+            status = "500 Internal Server Error\r\n".encode(charset)
+            response = status + error_message
+            print (status.decode(charset) + " : " + error_message)
 
 
 
 
-        # encode header and append to requested file
+        # encode header and append to requested file for server response
         try :
             header_in_bytes = reply_header.encode(charset)
             response = header_in_bytes + requested_file
         except UnicodeError :
             error_message = "ERROR Encode Reply Header\r\n\r\n".encode(charset)
             status = "500 Internal Server Error\r\n".encode(charset)
-            requested_file = status + error_message
+            response = status + error_message
+            print (status.decode(charset) + " : " + error_message.decode(charset))
 
 
 
