@@ -43,7 +43,6 @@ TEXT_TYPE = "text/html"                 # http text message type
 PNG_TYPE = "image/png"                  # http png message type
 JPG_TYPE = "image/jpeg"                 # http jpg message type
 JPEG_TYPE = "image/jpeg"                # http jpeg message type
-HEADER_SIZE = 20                        # max header size
 
 
 
@@ -377,7 +376,6 @@ while True :
                         # get file size and convert to string
                         try :
                             file_size = os.path.getsize(file_name)
-                            file_size += HEADER_SIZE
                             length_str = str(file_size)
                         except OSError :
                             error_message = "ERROR Obtaining File Size"
@@ -388,18 +386,7 @@ while True :
                         try :
                             md_stamp = os.path.getmtime(file_name)
                             md_obj = datetime.datetime.fromtimestamp(md_stamp)
-                            #md_time_tuple = repr(md_obj)
-                            #modified_date_obj = datetime(md_time_tuple)
                             modified_date = md_obj.strftime("%Y-%m-%d %H:%M:%S")
-                            #TODO: fix
-                            #   Last-Modified:
-                            #       datetime.datetime(2018, 11, 10, 19, 51, 57)
-                            # https://www.saltycrane.com/blog/2008/11/python-datetime-time-conversions/
-                            #
-
-                            #md = str(os.path.getmtime(file_name))
-                            #t = int(md)
-                            #modified_date = datetime.datetime.fromtimestamp(t)
                         except OSError :
                             error_message = "ERROR Obtaining Modified Time"
                             status = "500 Internal Server Error"
@@ -517,10 +504,10 @@ while True :
     clientSock.close()
     print ("Listening for Next Client on Port Number : " + user_input)
 
-# TODO :    look at last modified time
+# TODO :
 #           review error checking
 #           review assignment requirements
-#           add body size field
+
 
 
 
