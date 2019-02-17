@@ -124,32 +124,32 @@ except ValueError :
 
 
 # open socket connection for TCP stream
-try :
-    sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
-except ConnectionError :
+try:
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+except ConnectionError:
     error_message = "ERROR Establishing a Socket"
-    print (error_message)
-    sys.exit ("Exiting Program")
+    print(error_message)
+    sys.exit("Exiting Program")
 
 # bind the socket to the port
 try :
-    sock.bind ((host, port))
-except ConnectionError :
+    sock.bind((host, port))
+except ConnectionError:
     error_message = "ERROR ConnectionError Binding the Host and Port"
-    print (error_message)
-    sys.exit ("Exiting Program")
-except OSError :
+    print(error_message)
+    sys.exit("Exiting Program")
+except OSError:
     error_message = "ERROR Port Already in Use"
-    print (error_message)
-    sys.exit ("Exiting Program")
+    print(error_message)
+    sys.exit("Exiting Program")
 
 # set socket to listen
-try :
-    sock.listen (maximum_queue)
-except ConnectionError :
+try:
+    sock.listen(maximum_queue)
+except ConnectionError:
     error_message = "ERROR Opening a Listening Socket"
-    print (error_message)
-    sys.exit ("Exiting Program")
+    print(error_message)
+    sys.exit("Exiting Program")
 
 # print confirmation of active listening socket
 print ("Listening for Client on Port Number : " + user_input)
