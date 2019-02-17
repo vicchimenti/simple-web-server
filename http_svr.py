@@ -132,7 +132,7 @@ except ConnectionError:
     sys.exit("Exiting Program")
 
 # bind the socket to the port
-try :
+try:
     sock.bind((host, port))
 except ConnectionError:
     error_message = "ERROR ConnectionError Binding the Host and Port"
