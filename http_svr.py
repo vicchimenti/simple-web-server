@@ -83,18 +83,18 @@ except AttributeError:
     print(error_message)
     sys.exit("Exiting Program")
 
-
+"""
 # get user defined port number from the command line
 try:
     user_input = sys.argv[1]
 except IndexError:
     error_message = "ERROR No Valid Command Line Input"
     print(error_message)
-    sys.exit("Exiting Program")
+    # sys.exit("Exiting Program")
 except KeyError:
     error_message = "ERROR Invalid Command Line Entry"
     print(error_message)
-    sys.exit("Exiting Program")
+    # sys.exit("Exiting Program")
 
 # convert input to port number
 try:
@@ -102,8 +102,8 @@ try:
 except ValueError:
     error_message = "ERROR Command Line Entry is Not an Integer"
     print(error_message)
-    sys.exit("Exiting Program")
-
+    # sys.exit("Exiting Program")
+"""
 
 # open socket connection for TCP stream
 try:
@@ -134,7 +134,7 @@ except ConnectionError:
     sys.exit("Exiting Program")
 
 # print confirmation of active listening socket
-print("Listening for Client on Port Number : " + user_input)
+print("Listening for Client on Port Number : " + str(port))
 
 
 # **************   open client sockets and exchange messages   *************** #
@@ -453,7 +453,7 @@ while True:
     # Close the Client Socket
     print("Response Sent : Closing Client Socket")
     clientSock.close()
-    print("Listening for Next Client on Port Number : " + user_input)
+    print("Listening for Next Client on Port Number : " + str(port))
 
 """
 TODO :
