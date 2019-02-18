@@ -190,6 +190,7 @@ while True:
         # receive request until delimiter found
         try:
             while True:
+                # noinspection PyUnboundLocalVariable
                 message = clientSock.recv(4096)
                 client_message += message.decode(charset)
                 x = client_message.find(END_HEADER)
@@ -433,7 +434,7 @@ while True:
             error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n".encode(charset)
             status = "500 Internal Server Error\r\n".encode(charset)
             response = status + error_message
-            print(status.decode(charset) + " : " + error_message)
+            print(status.decode(charset) + " : " + error_message.decode(charset))
 
         # encode header and append to requested file for server response
         try:
@@ -471,6 +472,7 @@ while True:
     clientSock.close()
     print("Listening for Next Client on Port Number : " + str(port))
 
+# noinspection PyUnreachableCode
 """
 TODO :
           review error checking
