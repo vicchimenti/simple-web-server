@@ -3,7 +3,7 @@
 # http_svr.py
 # A Simple Web Server in Python3
 # Created           10/30/2018
-# Last Modified     11/15/2018
+# Last Modified     2/18/2019
 # /usr/local/python3/bin/python3
 
 
@@ -54,9 +54,16 @@ charset = "UTF-8"               # default encoding protocol
 client_method = "GET"           # acceptable client method
 mime_type = TEXT_TYPE           # default to text/html
 error_message = NEW_LINE        # default error message for response header
+path_protocol = CLIENT_PROTOCOL # default assignment : will assign within if statement
+path_raw = path_protocol        # default assignment : will assign within if statement
+file_type = mime_type           # default assignment : will assign within if statement
+protocol = path_raw             # default assignment : will assign within if statement
+modified_date = DATE_FIELD      # default assignment : will assign within if statement
+length_str = ''                 # default assignment : will assign within if statement
+reply_header = ''                # default assignment : will assign within if statement
 
 
-# ***************    System Set Up for Socket   ***************************** #
+# ***************    System Set Up for Socket   ***************************** #s
 
 
 # establish working directory
@@ -77,24 +84,24 @@ except AttributeError:
 
 # get the host IP number
 try:
-    host_ip = socket.gethostbyname(host)
+    host_ip = socket.getaddrinfo(host, port)
 except AttributeError:
     error_message = "ERROR Failed to Get Host IP Number"
     print(error_message)
     sys.exit("Exiting Program")
 
-
+"""
 # get user defined port number from the command line
 try:
     user_input = sys.argv[1]
 except IndexError:
     error_message = "ERROR No Valid Command Line Input"
     print(error_message)
-    sys.exit("Exiting Program")
+    # sys.exit("Exiting Program")
 except KeyError:
     error_message = "ERROR Invalid Command Line Entry"
     print(error_message)
-    sys.exit("Exiting Program")
+    # sys.exit("Exiting Program")
 
 # convert input to port number
 try:
@@ -102,8 +109,8 @@ try:
 except ValueError:
     error_message = "ERROR Command Line Entry is Not an Integer"
     print(error_message)
-    sys.exit("Exiting Program")
-
+    # sys.exit("Exiting Program")
+"""
 
 # open socket connection for TCP stream
 try:
@@ -134,7 +141,7 @@ except ConnectionError:
     sys.exit("Exiting Program")
 
 # print confirmation of active listening socket
-print("Listening for Client on Port Number : " + user_input)
+print("Listening for Client on Port Number : " + str(port))
 
 
 # **************   open client sockets and exchange messages   *************** #
@@ -166,6 +173,10 @@ while True:
         (clientSock, address) = sock.accept()
         addr_str = str(address)
         print("Connection Established With: " + addr_str)
+    except NameError:
+        error_message = "Error sock.accept() did not assign values correctly"
+        status = "500 Internal Server Error"
+        exit_socket = 11
     except ConnectionError:
         error_message = "ERROR Unable to Connect with Client"
         status = "500 Internal Server Error"
@@ -179,6 +190,7 @@ while True:
         # receive request until delimiter found
         try:
             while True:
+                # noinspection PyUnboundLocalVariable
                 message = clientSock.recv(4096)
                 client_message += message.decode(charset)
                 x = client_message.find(END_HEADER)
@@ -196,7 +208,7 @@ while True:
             print("Client Request :\n" + client_message)
 
             # scan for malware
-            x = client_message.find (MAL_SET)
+            x = client_message.find(MAL_SET)
             if x != -1:
                 error_message = "ERROR Invalid Request Attempt"
                 status = "400 Bad Request"
@@ -205,7 +217,7 @@ while True:
             # when no mal script present
             else:
                 # parse and process client request
-                x = client_message.find (client_method)
+                x = client_message.find(client_method)
                 # if request is approved method then begin processing
                 if x != -1:
                     try:
@@ -215,6 +227,11 @@ while True:
                         error_message = "ERROR Unable to Strip Request Type"
                         status = "501 Not Implemented"
                         exit_socket = 31
+                    except NameError:
+                        error_message = "ERROR client_message.split did not assign values correctly"
+                        status = "501 Not Implemented"
+                        exit_socket = 31
+
                 else:
                     error_message = "ERROR Invalid Request Type"
                     status = "501 Not Implemented"
@@ -417,7 +434,7 @@ while True:
             error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n".encode(charset)
             status = "500 Internal Server Error\r\n".encode(charset)
             response = status + error_message
-            print(status.decode(charset) + " : " + error_message)
+            print(status.decode(charset) + " : " + error_message.decode(charset))
 
         # encode header and append to requested file for server response
         try:
@@ -453,15 +470,11 @@ while True:
     # Close the Client Socket
     print("Response Sent : Closing Client Socket")
     clientSock.close()
-    print("Listening for Next Client on Port Number : " + user_input)
+    print("Listening for Next Client on Port Number : " + str(port))
 
-"""
-TODO :
-          review error checking
-          review assignment requirements 
-"""
 
 # Close the Listening Socket
+# noinspection PyUnreachableCode
 sock.close()
 # Exit the Program
 sys.exit()
