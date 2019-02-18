@@ -54,9 +54,16 @@ charset = "UTF-8"               # default encoding protocol
 client_method = "GET"           # acceptable client method
 mime_type = TEXT_TYPE           # default to text/html
 error_message = NEW_LINE        # default error message for response header
+path_protocol = CLIENT_PROTOCOL # default assignment : will assign within if statement
+path_raw = path_protocol        # default assignment : will assign within if statement
+file_type = mime_type           # default assignment : will assign within if statement
+protocol = path_raw             # default assignment : will assign within if statement
+modified_date = DATE_FIELD      # default assignment : will assign within if statement
+length_str = ''                 # default assignment : will assign within if statement
+reply_header = ''                # default assignment : will assign within if statement
 
 
-# ***************    System Set Up for Socket   ***************************** #
+# ***************    System Set Up for Socket   ***************************** #s
 
 
 # establish working directory
@@ -166,6 +173,10 @@ while True:
         (clientSock, address) = sock.accept()
         addr_str = str(address)
         print("Connection Established With: " + addr_str)
+    except NameError:
+        error_message = "Error sock.accept() did not assign values correctly"
+        status = "500 Internal Server Error"
+        exit_socket = 11
     except ConnectionError:
         error_message = "ERROR Unable to Connect with Client"
         status = "500 Internal Server Error"
@@ -215,6 +226,11 @@ while True:
                         error_message = "ERROR Unable to Strip Request Type"
                         status = "501 Not Implemented"
                         exit_socket = 31
+                    except NameError:
+                        error_message = "ERROR client_message.split did not assign values correctly"
+                        status = "501 Not Implemented"
+                        exit_socket = 31
+
                 else:
                     error_message = "ERROR Invalid Request Type"
                     status = "501 Not Implemented"
