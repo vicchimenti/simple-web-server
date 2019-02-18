@@ -7,14 +7,10 @@
 # /usr/local/python3/bin/python3
 
 
-
-
 import socket       # TCP Socket Operations
 import sys          # System Calls
 import os           # File and Directory Information
 import datetime     # System Time
-
-
 
 
 # *****   set constants for grammar   ***
@@ -24,8 +20,6 @@ SINGLE_SLASH = "/"                      # single slash delimiter
 SEMI_COLON = ";"                        # semicolon delimiter
 COLON = ":"                             # colon delimiter
 WHITE_SPACE = " "                       # single whitespace
-
-
 
 
 #  *****   set constants for building and formatting the response header   ***
@@ -45,16 +39,12 @@ JPG_TYPE = "image/jpeg"                 # http jpg message type
 JPEG_TYPE = "image/jpeg"                # http jpeg message type
 
 
-
-
 # *****   set constants for request parsing   ***
 CLIENT_PROTOCOL = "HTTP/1.1"            # acceptable client protocol
 DEFAULT_FILE_TYPE = TEXT_MATCH          # when no file type is indicated
 DEFAULT_FILE = "index.html"             # when no path is provided
 WEB_ROOT = "/web_root"                  # for internal path routing
 MAL_SET = "/../"                        # malware delimiter
-
-
 
 
 # initialize default values
@@ -66,36 +56,32 @@ mime_type = TEXT_TYPE           # default to text/html
 error_message = NEW_LINE        # default error message for response header
 
 
-
-
 # ***************    System Set Up for Socket   ***************************** #
 
 
-
-
 # establish working directory
-try :
+try:
     server_home = os.getcwd()
-except NameError :
+except NameError:
     error_message = "ERROR Failed to Get Current Working Directory"
-    print (error_message)
-    sys.exit ("Exiting Program")
+    print(error_message)
+    sys.exit("Exiting Program")
 
 # get the hostname
-try :
+try:
     host = socket.gethostname()
-except AttributeError :
+except AttributeError:
     error_message = "ERROR Failed to Get Hostname"
-    print (error_message)
-    sys.exit ("Exiting Program")
+    print(error_message)
+    sys.exit("Exiting Program")
 
 # get the host IP number
-try :
+try:
     host_ip = socket.gethostbyname(host)
-except AttributeError :
+except AttributeError:
     error_message = "ERROR Failed to Get Host IP Number"
-    print (error_message)
-    sys.exit ("Exiting Program")
+    print(error_message)
+    sys.exit("Exiting Program")
 
 
 
