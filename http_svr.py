@@ -342,52 +342,46 @@ while True:
                             exit_socket = 61
 
                         # get file size and convert to string
-                        try :
+                        try:
                             file_size = os.path.getsize(file_name)
                             length_str = str(file_size)
-                        except OSError :
+                        except OSError:
                             error_message = "ERROR Obtaining File Size"
                             status = "500 Internal Server Error"
                             exit_socket = 62
 
                         # get time last modified
-                        try :
+                        try:
                             md_stamp = os.path.getmtime(file_name)
                             md_obj = datetime.datetime.fromtimestamp(md_stamp)
                             modified_date = md_obj.strftime("%Y-%m-%d %H:%M:%S")
-                        except OSError :
+                        except OSError:
                             error_message = "ERROR Obtaining Modified Time"
                             status = "500 Internal Server Error"
                             exit_socket = 63
 
-
-
-
                         # open file and stream data
-                        if exit_socket == 0 :
+                        if exit_socket == 0:
 
                             # open the file and assign to a string
-                            try :
+                            try:
                                 with open(file_name, 'rb') as file:
                                     requested_file = file.read()
                                 status = "200 OK"
-                            except FileNotFoundError :
+                            except FileNotFoundError:
                                 error_message = "ERROR Reading Requested File"
                                 status = "500 Internal Server Error"
                                 exit_socket = 70
-                            except UnicodeError :
+                            except UnicodeError:
                                 error_message = "ERROR Decoding Data"
                                 status = "500 Internal Server Error"
                                 exit_socket = 71
 
-
-
-
     #  *********************   if no errors   ******************************** #
-    if error_message == NEW_LINE :
+    if error_message == NEW_LINE:
 
         # prep results for delivery
-        try :
+        try:
             status_line =   protocol + WHITE_SPACE  + status + NEW_LINE
             content_line =  CONTENT_FIELD           + COLON \
                                                     + WHITE_SPACE \
@@ -419,67 +413,53 @@ while True:
                                                     + length_line \
                                                     + connect_line \
                                                     + END_HEADER
-        except TypeError :
+        except TypeError:
             error_message = "ERROR Can't Concatenate Bytes and Strings\r\n\r\n".encode(charset)
             status = "500 Internal Server Error\r\n".encode(charset)
             response = status + error_message
-            print (status.decode(charset) + " : " + error_message)
-
-
-
+            print(status.decode(charset) + " : " + error_message)
 
         # encode header and append to requested file for server response
-        try :
+        try:
             header_in_bytes = reply_header.encode(charset)
             response = header_in_bytes + requested_file
-        except UnicodeError :
+        except UnicodeError:
             error_message = "ERROR Encode Reply Header\r\n\r\n".encode(charset)
             status = "500 Internal Server Error\r\n".encode(charset)
             response = status + error_message
-            print (status.decode(charset) + " : " + error_message.decode(charset))
-
-
-
+            print(status.decode(charset) + " : " + error_message.decode(charset))
 
         # return results to client
-        print (status)
-        try :
+        print(status)
+        try:
             clientSock.sendall(response)
-        except OSError :
-            print ("ERROR Sending Requested File")
-            sys.exit ("Exiting Program")
-
-
-
+        except OSError:
+            print("ERROR Sending Requested File")
+            sys.exit("Exiting Program")
 
     # return an error response
     else:
         status += END_HEADER
         exit_code = str(exit_socket)
         error_response = status
-        print (error_response + error_message + " : " + exit_code)
+        print(error_response + error_message + " : " + exit_code)
         # return error to client
-        try :
+        try:
             clientSock.sendall(error_response.encode(charset))
-        except OSError :
-            print ("ERROR Sending Requested File")
-            sys.exit ("Exiting Program")
-
-
-
+        except OSError:
+            print("ERROR Sending Requested File")
+            sys.exit("Exiting Program")
 
     # Close the Client Socket
-    print ("Response Sent : Closing Client Socket")
+    print("Response Sent : Closing Client Socket")
     clientSock.close()
-    print ("Listening for Next Client on Port Number : " + user_input)
+    print("Listening for Next Client on Port Number : " + user_input)
 
-# TODO :
-#           review error checking
-#           review assignment requirements
-
-
-
-
+"""
+TODO :
+          review error checking
+          review assignment requirements 
+"""
 
 # Close the Listening Socket
 sock.close()
