@@ -84,29 +84,25 @@ except AttributeError:
     sys.exit("Exiting Program")
 
 
-
-
 # get user defined port number from the command line
-try :
+try:
     user_input = sys.argv[1]
-except IndexError :
+except IndexError:
     error_message = "ERROR No Valid Command Line Input"
-    print (error_message)
-    sys.exit ("Exiting Program")
-except KeyError :
+    print(error_message)
+    sys.exit("Exiting Program")
+except KeyError:
     error_message = "ERROR Invalid Command Line Entry"
-    print (error_message)
-    sys.exit ("Exiting Program")
+    print(error_message)
+    sys.exit("Exiting Program")
 
 # convert input to port number
-try :
-    port = int (user_input)
-except ValueError :
+try:
+    port = int(user_input)
+except ValueError:
     error_message = "ERROR Command Line Entry is Not an Integer"
-    print (error_message)
-    sys.exit ("Exiting Program")
-
-
+    print(error_message)
+    sys.exit("Exiting Program")
 
 
 # open socket connection for TCP stream
@@ -138,17 +134,13 @@ except ConnectionError:
     sys.exit("Exiting Program")
 
 # print confirmation of active listening socket
-print ("Listening for Client on Port Number : " + user_input)
-
-
+print("Listening for Client on Port Number : " + user_input)
 
 
 # **************   open client sockets and exchange messages   *************** #
 
-
-
 # establish client socket loop
-while True :
+while True:
 
     # reset client defaults
     cwd = server_home
@@ -158,9 +150,9 @@ while True :
     requested_file = ""
 
     # reset working directory each iteration
-    try :
+    try:
         os.chdir(cwd)
-    except FileNotFoundError :
+    except FileNotFoundError:
         error_message = "ERROR Path Not Found"
         status = "404 Not Found"
         exit_socket = 10
@@ -169,205 +161,182 @@ while True :
     connection_value = "close"
     status = ""
 
-
-
-
     # connect to client
-    try :
+    try:
         (clientSock, address) = sock.accept()
-        addr_str = str (address)
-        print ("Connection Established With: " + addr_str)
-    except ConnectionError :
+        addr_str = str(address)
+        print("Connection Established With: " + addr_str)
+    except ConnectionError:
         error_message = "ERROR Unable to Connect with Client"
         status = "500 Internal Server Error"
         exit_socket = 11
 
-
-
-
     # proceed when exit socket is not active
-    if exit_socket == 0 :
-
+    if exit_socket == 0:
         # initialize message receive string
         client_message = ""
 
-
-
-
         # receive request until delimiter found
-        try :
-            while True :
-                message = clientSock.recv (4096)
-                client_message += message.decode (charset)
+        try:
+            while True:
+                message = clientSock.recv(4096)
+                client_message += message.decode(charset)
                 x = client_message.find(END_HEADER)
-                if x != -1 : break
-        except ConnectionError :
+                if x != -1:
+                    break
+        except ConnectionError:
                 error_message = "ERROR Receiving Client Message"
                 status = "500 Internal Error"
                 exit_socket = 20
 
-
-
-
         # begin parsing request when exit socket is not active
-        if exit_socket == 0 :
+        if exit_socket == 0:
 
             # Display the Client Request
-            print ("Client Request :\n" + client_message)
+            print("Client Request :\n" + client_message)
 
             # scan for malware
             x = client_message.find (MAL_SET)
-            if x != -1 :
+            if x != -1:
                 error_message = "ERROR Invalid Request Attempt"
                 status = "400 Bad Request"
                 exit_socket = 30
 
             # when no mal script present
-            else :
+            else:
                 # parse and process client request
                 x = client_message.find (client_method)
                 # if request is approved method then begin processing
-                if x != -1 :
-                    try :
+                if x != -1:
+                    try:
                         get_request, path_protocol = \
                             client_message.split(client_method, 2)
-                    except IndexError :
+                    except IndexError:
                         error_message = "ERROR Unable to Strip Request Type"
                         status = "501 Not Implemented"
                         exit_socket = 31
-                else :
+                else:
                     error_message = "ERROR Invalid Request Type"
                     status = "501 Not Implemented"
                     exit_socket = 32
 
-
-
-
             # parse the pathway from the request protocol
-            if exit_socket == 0 :
+            if exit_socket == 0:
 
-                #if protocol is HTTP parse path from message
-                x = path_protocol.find (CLIENT_PROTOCOL)
+                # if protocol is HTTP parse path from message
+                x = path_protocol.find(CLIENT_PROTOCOL)
                 # if request is in HTTP format
-                if x != -1 :
-                    try :
+                if x != -1:
+                    try:
                         path_raw = path_protocol[:x]
                         # assign local via constant until more protocols approved
                         protocol = CLIENT_PROTOCOL
                         path_raw = path_raw.strip()
                         protocol = protocol.strip()
-                    except IndexError :
+                    except IndexError:
                         error_message = "ERROR Unable to Strip Protocol"
                         status = "400 Bad Request"
                         exit_socket = 40
-                else :
+                else:
                     error_message = "ERROR Not a Valid HTTP Request"
                     status = "400 Bad Request"
                     exit_socket = 41
 
-
                 # initialize the file string
                 file_name = ""
                 # proceed when exit socket is not active
-                if exit_socket == 0 :
+                if exit_socket == 0:
 
                     # finalize the working directory
                     path = cwd + WEB_ROOT + path_raw
 
                     # in the case of an empty path
-                    if path_raw == SINGLE_SLASH :
+                    if path_raw == SINGLE_SLASH:
 
                         # finalize the working directory and default file
                         file_name = DEFAULT_FILE
 
                         # change to requested directory
-                        try :
+                        try:
                             os.chdir(path)
-                        except FileNotFoundError :
+                        except FileNotFoundError:
                             error_message = "ERROR Valid Path Not Found"
                             status = "404 Not Found"
                             exit_socket = 50
 
-
-
                     # requested path contains a directory then check for file extension
-                    elif os.path.isfile(path) :
+                    elif os.path.isfile(path):
 
                         # the path ends in a file extension so extract the path from the file
-                        try :
+                        try:
                             path, file_name = path.rsplit(SINGLE_SLASH, 1)
-                        except IndexError :
-                            error_message = "ERROR Spliting Filename from Path"
+                        except IndexError:
+                            error_message = "ERROR Splitting Filename from Path"
                             status = "400 Bad Request"
                             exit_socket = 51
 
                         # strip the file name of any trailing whitespace
-                        try :
+                        try:
                             file_name = file_name.rstrip()
-                        except IndexError :
+                        except IndexError:
                             error_message = \
                                 "ERROR Striping Whitespace from Filename"
                             status = "400 Bad Request"
                             exit_socket = 52
 
                         # change to requested directory
-                        try :
+                        try:
                             os.chdir(path)
-                        except FileNotFoundError :
+                        except FileNotFoundError:
                             error_message = "ERROR File Not Found"
                             status = "404 Not Found"
                             exit_socket = 53
 
-
-
                     # or else the path does not contain a filename
-                    elif os.path.isdir(path) :
+                    elif os.path.isdir(path):
 
                         # use the default file
                         file_name = DEFAULT_FILE
 
                         # change to requested directory
-                        try :
+                        try:
                             os.chdir(path)
-                        except FileNotFoundError :
+                        except FileNotFoundError:
                             error_message = "ERROR Path Not Found"
                             status = "404 Not Found"
                             exit_socket = 54
 
                     # or else no valid path is given
-                    else :
+                    else:
                         error_message = "ERROR Invalid Path Requested"
                         status = "404 Not Found"
                         exit_socket = 55
 
-
-
-
                     # gather file information and store for header
-                    if exit_socket == 0 :
+                    if exit_socket == 0:
 
                         # extract the file type from the filename
-                        try :
+                        try:
                             file_name_only, file_type = os.path.splitext(file_name)
-                        except OSError :
+                        except OSError:
                             error_message = "ERROR Unable to Determine FileType"
                             status = "500 Internal Server Error"
                             exit_socket = 60
 
                         # set the mime type
-                        try :
-                            if file_type == TEXT_MATCH :
+                        try:
+                            if file_type == TEXT_MATCH:
                                 mime_type = TEXT_TYPE
-                            elif file_type == PNG_MATCH :
+                            elif file_type == PNG_MATCH:
                                 mime_type = PNG_TYPE
-                            elif file_type == JPG_MATCH :
+                            elif file_type == JPG_MATCH:
                                 mime_type = JPG_TYPE
-                            elif file_type == JPEG_MATCH :
+                            elif file_type == JPEG_MATCH:
                                 mime_type = JPEG_TYPE
-                            else :
+                            else:
                                 error_message = "ERROR Assigning MIME Type"
                                 status = "500 Internal Server Error"
-                        except OSError :
+                        except OSError:
                             error_message = "ERROR Assigning MIME Type"
                             status = "500 Internal Server Error"
                             exit_socket = 61
