@@ -3,7 +3,7 @@
 # http_svr.py
 # A Simple Web Server in Python3
 # Created           10/30/2018
-# Last Modified     11/15/2018
+# Last Modified     2/18/2019
 # /usr/local/python3/bin/python3
 
 
@@ -196,7 +196,7 @@ while True:
             print("Client Request :\n" + client_message)
 
             # scan for malware
-            x = client_message.find (MAL_SET)
+            x = client_message.find(MAL_SET)
             if x != -1:
                 error_message = "ERROR Invalid Request Attempt"
                 status = "400 Bad Request"
@@ -205,7 +205,7 @@ while True:
             # when no mal script present
             else:
                 # parse and process client request
-                x = client_message.find (client_method)
+                x = client_message.find(client_method)
                 # if request is approved method then begin processing
                 if x != -1:
                     try:
