@@ -77,7 +77,7 @@ except AttributeError:
 
 # get the host IP number
 try:
-    host_ip = socket.gethostbyname(host)
+    host_ip = socket.getaddrinfo(host, port)
 except AttributeError:
     error_message = "ERROR Failed to Get Host IP Number"
     print(error_message)
