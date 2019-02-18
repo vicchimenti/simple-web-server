@@ -472,14 +472,9 @@ while True:
     clientSock.close()
     print("Listening for Next Client on Port Number : " + str(port))
 
-# noinspection PyUnreachableCode
-"""
-TODO :
-          review error checking
-          review assignment requirements 
-"""
 
 # Close the Listening Socket
+# noinspection PyUnreachableCode
 sock.close()
 # Exit the Program
 sys.exit()
